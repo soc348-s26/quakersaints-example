@@ -10,6 +10,12 @@ It is specific to this book. But also
 you should be able to follow a similar process for your book.  However, each book has its own special
 issues that need to be taken into account.
 
+This is the order for the first steps.
+
+1. creat_quakersaints_data   
+2. tokenization   
+3. curation_toc
+
 
 
 

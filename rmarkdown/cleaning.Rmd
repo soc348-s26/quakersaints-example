@@ -1,0 +1,495 @@
+---
+title: "Curating the data"
+output: html_document
+---
+
+```{r}
+library(gutenbergr)
+library(tidytext)
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(scales)
+library(ggforce)
+library(forcats)
+library(here)
+```
+
+I don't want to redownload each time I run this file (because it takes
+time and is an unnecessary load on Project Gutenberg) . I can save a working copy of the data and use that
+when experimenting.  Doing it this way I can still run the whole
+process by deleting or renaming the "data/quakersaints.rda" file. 
+
+To load the saved dataset I use the `load()` function.
+
+```{r }
+if (!file.exists(here("data/quakersaints.rda"))) {
+     quakersaints <-  gutenberg_download(c(19605))
+     save(quakersaints, file="data/quakersaints.rda")
+} else {
+     load(here("data/quakersaints.rda"))
+}
+```
+
+Previously, we dove straight into tokenizing. But this time let's 
+first think about how we could solve some issues. 
+
+Looking specifically at this book, I notice first that there are the 
+standard Project Gutenberg texts at the beginning, followed by an 
+preface which ends on line 182.
+
+Then from 192 to 260 there is a table of contents with many blank lines. 
+Also * in the title indicates "for younger children." 
+
+I would like to separate each of the stories
+
+Using this information, I can subset the data.
+
+```{r}
+
+table_of_contents <- quakersaints[190:260,] 
+# Remove blank lines
+table_of_contents <- table_of_contents |> filter(text != "")
+table_of_contents$text
+```
+
+What do you notice about the table of contents? 
+I see at least 3 issues.
+
+1. The * at the beginning of some lines, which indicate whether
+the story is appropriate for younger people.
+
+2. The titles are followed by white spaces and then a page number.
+
+3. There are roman numerals, both for the chapter numbering and 
+the page numbering for the preface.
+
+```{r}
+table_of_contents <- table_of_contents |>
+                     mutate(younger = substr(text, 1, 1) == "*")
+```
+
+
+```{r}
+table_of_contents <- table_of_contents |>
+                     mutate(title = "Title")
+```
+
+```{r}
+# Remove numbers (could also use "[0-9]+")
+table_of_contents <- table_of_contents |> 
+  mutate(text =gsub("[[:digit:]]+", "", text))
+# Deal with a special case
+table_of_contents <- table_of_contents |>
+  mutate(text = sub("_page_ vii", "", text, fixed = TRUE))
+# Remove *
+table_of_contents <- table_of_contents |> 
+  mutate(text = sub("*", "", text, fixed=TRUE))
+# Remove extra white space
+table_of_contents <- table_of_contents |> 
+  mutate(text =trimws(text))
+table_of_contents$text
+```
+
+Notice that without the last step there is a lot of "white space" around the titles.  I
+assume that these are " " values rather than tabs or other white 
+space characters.  However if that turns out to be wrong I will use
+one of the functions from stringr to get rid of them.
+
+All of the above mutates could be combined into one `mutate()` to be more
+efficient. They are separate to illustrate the step by step process.
+
+Also 
+ [1] "PREFACE"                                                
+ [2] "A TALK ABOUT SAINTS" 
+ [35] "COME-TO-GOOD" 
+ [36] "HISTORICAL NOTES"  
+ are different than the other sections so we may want to come back
+ and handle them. They don't have chapter numbers which indicates
+ that they are different kinnds of text.
+
+I'm going to cut down the quakersaints data so that it just contains
+text after the table of contents and list of illustrations. 
+
+```{r}
+quakersaints_trimmed <- quakersaints[290:nrow(quakersaints), ]
+```
+
+I'll also add a variable to represent the line number in the trimmed
+data. 
+As usual there are many ways to do this, I'll use the base method so
+you see it , but `mutate(id = row_number())` will also work.
+
+```{r}
+quakersaints_trimmed <-  quakersaints_trimmed |> 
+  mutate(row_number = row_number())
+```
+
+Let's find the chapter titles in the text.
+
+In the table of contents data the text variable in 
+that data is the same as the text variable in quakersaints_trimmed.
+I can now find the row numbers (locations) of the start of each 
+chapter by finding the row numbers of the matching text.
+I use the `%in%` function to say if the text in a row matches 
+one of the texts in the table of contents, keep it, otherwise
+drop it.
+
+```{r}
+title_locations <- 
+  quakersaints_trimmed |> 
+  filter(text %in% table_of_contents$text)
+title_locations
+```
+
+
+```{r}
+table_of_contents |> left_join(quakersaints_trimmed, 
+                               by = c("gutenberg_id", "text")) ->
+  table_of_contents
+```
+
+
+
+
+What's the problem now?    
+We can see that each title is repeated twice in the text.
+
+Go back and look at the text.  You can see that each chapter
+has some introductory items that are usually poems or quotations.
+These types of material are called epigraphs. (epi = over or on, 
+graph = writing)
+
+This means that to understand our text, we would want to separate it 
+into two groups (epigraph and story). I think we should also
+mark text as either a title or a text and also mark the non-stories 
+(the ones without Roman numerals) as different from the stories. 
+
+So we need: Title versus text
+            Epigraph versus body
+            Front matter (Preface, A talk about saints) versus
+                 Back matter (Come to Good, Historical notes) versus
+                 Stories
+
+There are many, many ways that we could do this. Figuring it out 
+requires you to think through the steps logically. 
+Assume that you will have to try many different logics to figure
+this out.  Sometimes you can be clever and sometimes you can
+be too clever, it takes practice to figure it out.  Each
+text you work with 
+
+We can use this information to say what kind of text each line is. 
+The case_when() function is useful when we have complicated if then/else if/ 
+else if .../else situations.
+
+```{r}
+title_locations <- 
+  quakersaints_trimmed |> 
+  mutate(text = trimws(text)) |>
+  right_join(table_of_contents, by = c("text", "row_number",
+                                       "gutenberg_id")) |>
+  group_by(text) |> 
+  mutate(toc_number =  row_number(),  
+         text_type = case_when( 
+                    text %in% 
+                        c("PREFACE", "A TALK ABOUT SAINTS") ~ 
+                                          "Front Matter Title",
+                    text %in% c("HISTORICAL NOTES") ~ "Back Matter Title",
+                    toc_number == 1 ~ "Epigraph Title", 
+                    TRUE ~ "Story Title"),
+         section_type = case_when(
+           text_type == "Epigraph Title" ~ "Epigraph",
+           text_type == "Story Title" ~ "Story",
+           text_type == "Front Matter Title" ~ "Front Matter",
+           text_type == "Back Matter Title"  ~ "Back Matter"
+         )) 
+title_locations
+```
+
+
+
+```{r}
+
+```
+So now I know where my stories and epigraphs start and the type of
+text.   But 
+I need to pull this back into the full data set and 
+actually assign all of the lines to their story. 
+
+As always there are a lot of ways to do that, but to keep it simple
+we will use the `fill()` function.
+
+Let's start by creating a variable indicating chapter. Then
+we will fill that using the title.
+
+
+```{r}
+
+quakersaints_trimmed |> 
+  left_join(title_locations, by = c("row_number", "gutenberg_id")) |>
+  # We get text.y and text.x because text is in both data frames,
+  # but not in the by vector.
+  rename(title = text.y, text = text.x) |>
+  mutate(text_type = case_when(is.na(text_type) ~ "Text",
+                               TRUE ~ text_type)) |>
+  fill(title) |> fill(section_type) |> fill(younger) -> quakersaints_trimmed
+
+```
+My analysis of the bigrams found that the most common ones were some names:
+
+george fox	201			
+robert fowler	36			
+james nayler	31			
+		
+judge fell
+john audland
+
+
+meeting house	26	
+steeple house 
+
+Before tokenizing I am going to use stringr to insert underscores between the 
+two words so that they are treated as one word.  
+
+
+thou art
+thou hast 
+Add to stop words:
+
+thou
+thee
+hast
+art 
+
+I am going to make those stop words
+
+```{r}
+stop_wordsq <- data.frame(word=c("thou", "thee", "thy", "art", "hast", "thine"))
+```
+
+
+In my case
+I suspect the poetic language might be different so I have indicated for each
+line whether it is part of an epigraph or story. 
+I might also suspect that the language differs between the stories that are 
+considered appropriate for younger children.
+
+I may also want to eliminate the titles from my analyses.
+
+So now I will tokenize.
+```{r}
+quakersaints_trimmed |> 
+  filter(text_type == "Text") |>
+  mutate(text = tolower(text)) |>
+  # do this first because we will add underscores
+  mutate(text = str_replace(text, "_", ""))|>
+  # simple stemming to remove 's
+  mutate(text = str_replace(text, "'s", ""))|>
+  #mutate(text = str_extract(text, "[a-z]+")) |>
+  mutate(text = str_replace_all(text,
+                                c("george fox" = "george_fox",
+                                  "g.bfox" = "george_fox",
+                                  "robert fowler" = "robert_fowler",
+                                  "james nayler" = "james_nayler",
+                                  "judge fell" = "judge_fell",
+                                  "john audland" = "john_audland",
+                                  "meeting-house" = "meeting_house",
+                                  "steeple-house" = "steeple_house",
+                                  "valiant sixty" = "valiant_sixty",
+                                  "edward burrough" = "edward_burrough",
+                                  "e. burrough" = "edward_burrough"
+                                  )))|>
+  filter(!is.na(text))  |>
+   unnest_tokens(word, text, to_lower = TRUE) ->
+  quakersaints_long
+
+```
+
+This time I am going to remove the punctuation and numbers and _then_ remove
+the stop words.
+
+```{r}
+
+quakersaints_long |>  
+  #mutate(word = str_extract(word, "[a-z']+")) |>
+  anti_join(stop_words) |>
+  anti_join(stop_wordsq) |>
+   filter(!is.na(word) )->
+  quakersaints_long
+
+```
+
+Let's look at the top 20 words in the book as a whole. 
+
+```{r}
+quakersaints_long |> count(word, sort = TRUE) #|> head(50)
+```
+
+Looking these over, what should I drop?  How could I have done this 
+earlier? 
+
+```{r}
+#quakersaints_long <- quakersaints_long |> filter (is.na(word) == FALSE)
+#quakersaints_long |> count(word, sort = TRUE) |> head(20)
+# Top 15 words for each type
+quakersaints_long |> group_by(section_type) |> count(word, sort = TRUE) |>
+  slice_head(n = 15)
+# Calculate for each word, what proportion of words in a type it makes up.
+quakersaints_long |> group_by(section_type) |> count(word, sort = TRUE) |>
+  mutate(proportion = n / sum(n)) |> select(-n) |>
+   pivot_wider(values_from = proportion, names_from = section_type) -> qs_props_section_type
+```
+
+
+```{r}
+qs_props_section_type |> 
+  mutate(anystory = !is.na(Story), anyepigraph = !is.na(Epigraph)) |>
+  group_by(anystory, anyepigraph) |>
+  summarize(n = n())
+```
+
+
+
+
+Notice that there are still plural words which can be deceptive
+
+```{r}
+ggplot(qs_props_section_type, aes(x = Epigraph, y = Story, 
+                      )) +
+  geom_abline(color = "gray40", lty = 2) +
+  geom_jitter(alpha = 0.1, size = 2.5, width = 0.3, height = 0.3) +
+  geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+  scale_x_log10(labels = percent_format()) +
+  scale_y_log10(labels = percent_format()) +
+  scale_color_gradient(limits = c(0, 0.001), 
+                       low = "darkslategray4", high = "gray75") +
+  theme(legend.position="none") +
+  labs(x = "Epigraph", y = "Story", title = "Word Distributions")
+```
+
+```{r}
+quakersaints_long |> group_by(younger) |> count(word, sort = TRUE) |>
+  mutate(proportion = n / sum(n)) |> select(-n) |>
+   pivot_wider(values_from = proportion, names_from = younger) -> qs_props_younger
+
+
+ggplot(qs_props_younger, aes(x = `TRUE`, y = `FALSE`, 
+                      )) +
+  geom_abline(color = "gray40", lty = 2) +
+  geom_jitter(alpha = 0.1, size = 2.5, width = 0.3, height = 0.3) +
+  geom_text(aes(label = word), check_overlap = TRUE, vjust = 1.5) +
+  scale_x_log10(labels = percent_format()) +
+  scale_y_log10(labels = percent_format()) +
+  scale_color_gradient(limits = c(0, 0.001), 
+                       low = "darkslategray4", high = "gray75") +
+  theme(legend.position="none") +
+  labs(x = "Younger", y = "Older", title = "Word Distributions")
+```
+
+
+
+
+```{r eval=FALSE}
+quakersaints_long |> group_by(title) |> count(word, sort = TRUE) |>
+  slice_head(n = 10) |> 
+   ungroup() |>
+  #mutate(word = reorder(word, n)) |>
+  
+  ggplot(aes( n, word)) +
+  geom_col() +
+  facet_wrap_paginate(~title, scales = "free_y", ncol =3) +
+  theme(strip.text = element_text(
+    size = 12, color = "dark green"))
+  
+```
+This is really smushed so I want to split it up and use a smaller 
+font.
+```{r }
+quakersaints_long |> group_by(title) |> count(word, sort = TRUE) |>
+  slice_head(n = 10) |>
+ mutate(word = reorder(word, n)) |>
+  ungroup() -> preprocessed
+
+
+
+
+```
+
+```{r}
+  
+  preprocessed |>
+  filter(title %in% table_of_contents$text[c(4, 6, 8, 10, 12 , 14)]) |> 
+   ggplot(aes( n, reorder_within(word,n,  title))) +
+  geom_col() +
+  facet_wrap(~title, scales = "free_y", ncol =2) +
+  scale_y_reordered() +
+  theme(strip.text = element_text(
+    size = 9, color = "dark green"))
+
+
+  
+```
+
+
+We could do this multiple times by copy and pasting and modifying 
+the list of numbers. 
+
+This is not the best option because all that copy and pasting 
+introduces the potential for errors. Also if we make changes, we will
+do it in one place.
+
+One solution, make a function.  In this case it will be a very
+specific function, not like one for use in other situations.
+
+```{r }
+# Chapters is a vector of the chapters to be graphed.
+make_faceted_title <- function(chapters ){
+     preprocessed |>
+      filter(title %in% table_of_contents$text[chapters]) |> 
+       ggplot(aes( n, reorder_within(word,n,  title))) +
+      geom_col() +
+      facet_wrap(~title, scales = "free_y", ncol =2) +
+      scale_y_reordered() +
+      theme(strip.text = element_text(
+        size = 9, color = "dark green"))
+}
+  
+```
+```{r}
+make_faceted_title(chapters = c(16, 18, 20, 22, 24, 26))
+make_faceted_title(seq(from = 28, to = 38, by = 2))
+make_faceted_title(seq(from = 40, to = 52, by = 2))
+make_faceted_title(seq(from = 54, to = 64, by = 2))
+make_faceted_title(seq(from = 66, to = 68, by = 2))
+```
+We could also make the function even more general by doing things
+like passing in the grouping variable and the name of the preprocessed
+data set.  We could even extract the grouping variable from the
+preprocessed data set.
+
+```{r}
+preprocessed |> group_by(title) |>
+group_vars()
+```
+
+In class/at home: Clean up the document (get rid of unneeded code, make it flow
+more smoothly), consider creating a function to reduce repetitive code, and
+edit the text to reflect what you did. 
+
+Also do the same kind of data wrangling and more focused analysis on your data. 
+
+I am going to save my trimmed data, simply to maintain consistency at this
+point. 
+
+```{r}
+save(quakersaints_trimmed, file = here("data/quakersaints_trimmed.rda"))
+save(quakersaints_long, file = here("data/quakersaints_long.rda"))
+
+```
+
+
+```{r}
+
+```
+

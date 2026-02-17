@@ -1,0 +1,381 @@
+---
+title: "Curating the data, part 1"
+output: html_document
+---
+```{r}
+library(dplyr)
+library(stringr)
+library(here)
+```
+
+
+This document contains the process of going back to the 
+`quakersaints` data and cleaning it up. This way the 
+tokenization process will ultimately give us the data that we 
+really want to analyze.
+
+It's important to know that this is an _iterative_ process. That
+is that you will find yourself going back to the beginning and
+making changes or realizing that you left out an important step
+that you need later.  So some of the work you will see here
+is the product of me having gone through the data set many times.
+Just like any kind of creative work, you may need to make 
+corrections, reorganize or sometimes go back to the beginning
+and make adjustments.
+
+I have also looked at the book itself to understand its structure.
+
+```{r}
+# If the file of saved data is not present
+if (!file.exists(here("data/quakersaints.rda"))) {
+     # download the data from Project Gutenberg
+     quakersaints <-  gutenberg_download(c(19605))
+     # and save it to that file name.
+     save(quakersaints, file="data/quakersaints.rda")
+# Otherwise, 
+} else {
+     # load the data set from the file.
+     load(here("data/quakersaints.rda"))
+}
+```
+
+
+Looking specifically at this book, I notice first that there are the 
+standard Project Gutenberg texts at the beginning. There is also
+the title page and a list of other books and dedcation.  These end at
+line 81. 
+This section is followed by an 
+preface which starts on line 82 and  ends on line 182.
+
+Then from 192 to 260 there is a table of contents with blank lines. 
+Also * in the title indicates "for younger children." 
+
+Then come the stories. 
+
+I would like to separate each of the stories so that later I can compare
+them.  However I really don't want the Table of Contents itself in 
+my final data. 
+
+Finally, from line 15189 to the end is also Project Gutenberg content.
+
+Using this information, I can modify the data to get what I want.
+
+A useful first step is to add a variable to the data that identifies
+the original row that the data came from.  This will turn out to 
+be really helpful for finding information in the original data and
+it also is data about the order in which things appear. Later, when
+we go back to `unnest_tokens()` this information will be associated
+with each token.
+
+Note that because this isn't saving this copy of `quakersaints` 
+so if we make a mistake, we can always go back and reload
+the original saved file.
+
+```{r}
+quakersaints |> mutate(row_number = row_number()) -> quakersaints
+```
+I can subset the data so that it only includes lines 82 to 15188.
+I'm going to call the new data set `quakersaints_trimmed`.
+
+```{r}
+quakersaints |> 
+  filter(row_number > 81 & row_number < 15189) ->
+  quakersaints_trimmed
+```
+
+I want to break my text into chapters.  I also can see that there 
+are different types of text. For example, the Preface and Historical
+Notes are not stories. Also "COME-TO-GOOD" and " A TALK ABOUT SAINTS"
+Do not have roman numerals.  A closer look at the text reveals
+that these are not stories but are thoughts from the author directly
+addressed to the reader.
+
+One thing that I also note about the book is that each story
+has a section before the story it self that consists of
+powms, quotations and other items. I would like to be able
+to separate those out, while keeping track of which epigraph
+goes with each story.
+
+There are multiple ways that you can approach this. In ths 
+esample I am going to start by working with the table of contents.
+Since the titles appear both in the table of contents
+and at the beginning of each chapter and epigraph.  I know this because
+I looked at the layout of the book in both the data file 
+and in the html version of the book on the Project Gutenberg website.
+I also note that the title is repeated before both the epigraph and
+the man text.
+
+```{r}
+table_of_contents <- quakersaints |>
+                     filter(row_number >= 190 & row_number <=260) |>
+                     filter(text != "")
+table_of_contents$text
+```
+
+Looking at these results I see that there is work I have to do 
+in order to make it possible to match the titles here with the titles
+in the rest of the text.
+
+First, I want to take off the "*" characters, but I want to 
+create a new variable called `younger` that indicates which
+stories were classified that way,
+I want to the remove the page numbers from each line, including
+the "_page_ vii" from the lines.  
+
+I also notice that there is "white space", probably " " characters,
+that I want to remove.
+I also want to indicate which of the chapters are not stories 
+and which are the sections beore the chapters (Front Matter) and
+after them (Back Matter).
+
+To make things easier to read, I'll break out the steps, although
+they could be put together using one big `mutate()`. While you are working,
+it often makes it easier to check for errors to do this. 
+
+```{r}
+
+# add the indicator for younger audiences
+table_of_contents <- table_of_contents |>
+                     mutate(younger = substr(text, 1, 1) == "*")
+```
+Next, let's create a variable that indicates these are titles.
+This will be useful later, when we want to separate titles
+from text.
+```{r}
+
+table_of_contents <- table_of_contents |> mutate(title = "Title")
+```
+
+
+
+```{r}
+# Remove numbers (could also use "[0-9]+")
+table_of_contents <- table_of_contents |> 
+  mutate(text =gsub("[[:digit:]]+", "", text))
+# Deal with a special case
+table_of_contents <- table_of_contents |>
+  mutate(text = sub("_page_ vii", "", text, fixed = TRUE))
+# Remove *
+table_of_contents <- table_of_contents |> 
+  mutate(text = sub("*", "", text, fixed=TRUE))
+# Remove extra white space
+table_of_contents <- table_of_contents |> 
+  mutate(text =trimws(text))
+table_of_contents$text
+```
+Next, I'll create a variable that indicates whether the title
+is for a story, front matter or back matter.
+This uses a function called `case_when()` that lets us set up
+more complex rules.
+
+```{r}
+  table_of_contents <- table_of_contents |>
+                mutate(text_type  = case_when (
+                  text %in%   c("PREFACE", "A TALK ABOUT SAINTS") ~ 
+                                          "Front Matter",
+                            text %in% 
+                               c("HISTORICAL NOTES", "COME-TO-GOOD") ~
+                                    "Back Matter",
+                         TRUE ~ "Story")
+                  )
+```
+```{r}
+head(table_of_contents)
+```
+
+
+
+This shows how to do takes some first steps toward combining the above
+steps into a longer piped sequence.
+```{r eval=FALSE}
+table_of_contents <- table_of_contents |>
+                     mutate(title = "Title",
+                            younger = substr(text, 1, 1) == "*",
+                            title = "Title",
+                            text_type  = case_when (
+                                         text %in%  c("PREFACE", "A TALK ABOUT SAINTS") ~
+                                          "Front Matter",
+                                          text %in%  c("HISTORICAL NOTES", "COME-TO-GOOD") ~
+                                    "Back Matter",
+                                          TRUE ~ "Story"),
+                            text =gsub("[[:digit:]]+", "", text),
+                            text = sub("_page_ vii", "", 
+                                       text, fixed = TRUE),
+                            text = trimws(
+                              sub("*", "", text, fixed=TRUE)
+                              ),
+
+                  
+                            )
+```
+
+
+Now we can use `table_of_contents` to find the lines in
+`quaker_saints`_trimmed that contain titles by matching the
+`text` values.  There are (as usual) lots of ways to do this. I'll
+do it with a left join.
+
+```{r eval=FALSE}
+table_of_contents |>
+  left_join(quakersaints_trimmed, by = "text")
+```
+
+This gives us a data set with some unexpected results.
+
+First, instead of row_number we have two variables: row_number.x and
+row_number.y. These numbers are different because they represent the
+row numbers from the table of contents and the row numbers from the 
+original text. 
+We also have gutenberg_id.x and gutenberg_id.y which is the same,
+because both the table of contents and the text came from the same 
+original file.  
+
+Also, except for the Preface there are two copies of each title.
+This is because the epigraphs and the stories both have the 
+titles where they start.
+
+This time we will remove the gutenberg_id and row_number before  doing the 
+join.
+
+`title_row` represents the row number where a match to the title in
+the table of contents was found.
+
+```{r eval=FALSE}
+table_of_contents |>
+  select(-gutenberg_id)  |>
+  left_join(quakersaints_trimmed, by = "text") |>
+  rename(title_row = row_number) ->
+  table_of_contents
+```
+
+One thing that we can notice is that two of the titles don't
+seem to match anything in the `quakersaints_trimmed`:   
+XXI. PALE WINDFLOWERS   
+XXVII. TWO ROBBER STORIES--WEST AND EAST    
+
+If we look back at the original text (https://www.gutenberg.org/cache/epub/19605/ we can see that in the body
+of the book, the titles are slightly different. 
+
+XXI. PALE WIND FLOWERS: OR THE LITTLE PRISON MAID
+XXVII. TWO ROBBER STORIES. WEST AND EAST
+
+Probably the simplest thing to do is to chang the table of 
+contents version to match that in the text. 
+
+For this it is probably simplest to use base R. 
+It took some work to find the exact right punctuation for each.
+This changes the specific rows to match exactly. 
+
+```{r}
+table_of_contents$text[table_of_contents$text == 
+                         "XXI. PALE WINDFLOWERS"] <-
+  "XXI. PALE WIND FLOWERS: OR THE LITTLE PRISON MAID"
+
+table_of_contents$text[table_of_contents$text %in% c( 
+                         "XXVII. TWO ROBBER STORIES--WEST AND EAST",
+                         "XXVII. TWO ROBBER STORIES-WEST AND EAST"
+                         )] <-
+  "XXVII. TWO ROBBER STORIES. WEST AND EAST"
+
+```
+
+Now I can try the matching again.
+
+```{r }
+table_of_contents |>
+  rename(toc_row = row_number) |>
+  select(-gutenberg_id)  |>
+  left_join(quakersaints_trimmed, by = "text") |>
+  rename(title_row = row_number) ->
+  table_of_contents
+```
+
+
+
+
+This still leaves us with two copies of most of  the titles.
+We can number these and in most cases use the numbers to indicate whether they
+represent epigraphs or the main texts. We will use some
+custom code to handle the fact that the Preface does not
+have an epigraph.
+
+```{r}
+table_of_contents |> 
+  group_by(text) |> 
+  mutate(title_number = row_number(),
+         title_type = case_when(
+                         text == "PREFACE" ~ "main",
+                         title_number == 1 ~ "epigraph",
+                         title_number == 2 ~ "main"
+         )) |>
+    ungroup() -> 
+  table_of_contents
+```
+
+
+Finally, and most important, we want to connect the `table_of_contents`
+information to the `quakesaints_trimmed` data.
+
+
+Again this required some thinking and experimentation to
+develop a procedure for. This is because if you just join on "text"
+you end up with 4 copies of each title instead of two. 
+
+First I am going create a new variable by copying the value of text
+in the  `table_of_contents` data. 
+
+We do not need the row_number from the table of contents in order
+to work with the text data.
+
+```{r}
+table_of_contents |> 
+  mutate(section_title = text) ->
+  table_of_contents
+```
+
+Now we can join, but instead of using a simple `by` option, we use
+the function `join_by` variables that have different names (and more
+than one variable at the same time.)
+The `arrange()` function is used to ensure that the resulting
+data set is in the original order.
+
+```{r}
+
+quakersaints_trimmed |>
+  left_join(table_of_contents,
+             by = join_by( "text" == "text",
+                           "row_number" == "title_row",
+                           "gutenberg_id" == "gutenberg_id")) |>
+  arrange(row_number) ->
+  quakersaints_trimmed
+```
+
+Now we have the same 15,107 rows that we started with in 
+`quakersaints_trimmed`.  
+However, a look at the data shows us that there are many missing
+values. Every row that was not a title is missing on most variables.
+For one, `title`, we would like to label all of the rest of the 
+rows as `text`.  
+For most of the others ("younger", "text_type", and "title_type" )
+we want every row in the connected text to have the same values.
+
+
+```{r}
+quakersaints_trimmed |> mutate(title = ifelse(is.na(title) == TRUE, 
+                                             "Text", "Title")) |>
+                        fill(text_type) |> 
+                        fill(title_type) |>
+                        fill(section_title) |>
+                        fill(younger) -> 
+  quakersaints_trimmed 
+```
+
+I'm going to save `quakersaints_trimmed` so that we can use
+the new data set, with all its extra information to tokenize 
+and also to compare types of text and specific stories to each other.
+
+```{r savetrimmed}
+
+save(quakersaints_trimmed, file = here("data/quakersaints_trimmed.rda"))
+
+```

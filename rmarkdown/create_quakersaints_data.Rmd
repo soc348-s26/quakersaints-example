@@ -1,0 +1,38 @@
+---
+title: "Initial steps"
+output: html_document
+---
+
+This file will go through the very basic step, with minimal cleaning.
+It will also create 
+
+I don't want to redownload each time I run this file (because it takes
+time and is an unnecessary load on Project Gutenberg) . I can save a working copy of the data and use that
+when experimenting.  Doing it this way I can still run the whole
+process by deleting or renaming the "data/quakersaints.rda" file. 
+
+To load the saved dataset I use the `load()` function.
+
+```{r }
+# If the file of saved data is not present
+if (!file.exists(here("data/quakersaints.rda"))) {
+     # download the data from Project Gutenberg
+     quakersaints <-  gutenberg_download(c(19605))
+     # and save it to that file name.
+     save(quakersaints, file="data/quakersaints.rda")
+# Otherwise, 
+} else {
+     # load the data set from the file.
+     load(here("data/quakersaints.rda"))
+}
+```
+
+I'm going to use blocks like this in almost all of my files. 
+This gives me the flexibility I need.
+I could make this into a function.  However, I instead chose to make
+it a "code snippet" which will let me easily paste it in any markdown
+file.
+Read about code snippets here:  
+https://docs.posit.co/ide/user/ide/guide/productivity/snippets.html
+
+
