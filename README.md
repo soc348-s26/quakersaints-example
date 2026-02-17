@@ -1,4 +1,4 @@
-# quakersaints analyss: An example
+# Quaker saints analysis: An example
 
 This will provide a step by step example of analysis of a single book _Quaker Saints_.
 
@@ -15,6 +15,10 @@ This is the order for the first steps.
 1. creat_quakersaints_data   
 2. tokenization   
 3. curation_toc
+4. tokenization_trimmed
+
+Then there are a set of sentiment analyses.
+I will add more advanced examples.
 
 
 
