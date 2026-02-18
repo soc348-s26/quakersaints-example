@@ -12,13 +12,16 @@ issues that need to be taken into account.
 
 This is the order for the first steps.
 
-1. creat_quakersaints_data   
+1. create_quakersaints_data   
 2. tokenization   
 3. curation_toc
 4. tokenization_trimmed
+5. sentiments_bing
+6. sentiments_afinn
+7. sentiments_nrc
 
-Then there are a set of sentiment analyses.
-I will add more advanced examples.
+If you run these yourself, in order, you will get the additional 
+saved files.
 
 
 
