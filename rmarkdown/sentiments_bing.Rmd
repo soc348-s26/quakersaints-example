@@ -1,5 +1,5 @@
 ---
-title: "Sentiment Analysis"
+title: "Sentiment Analysis using the Bing Lexicon"
 output: html_document
 editor_options: 
   markdown: 
@@ -24,22 +24,15 @@ I use `knitr::knit_exit()` to stop knitting if either of
 the data sets are not present.
 
 ```{r}
-
-if (file.exists(here("data/quakersaints_trimmed.rda"))) {
-     load(here("data/quakersaints_trimmed.rda"))
+if (file.exists(here("data/qs_tokens.rda"))) {
+     load(here("data/qs_tokens.rda")) 
 } else {
-  print("quakersaints_trimmed not present.")
-  knitr::knit_exit()
-}
-if (file.exists(here("data/quakersaints_long.rda"))) {
-     load(here("data/quakersaints_long.rda")) 
-} else {
-  print("quakersaints_long not present.")
+  print("qs_tokens not present.")
   knitr::knit_exit()
 }
 ```
 
-We will use the long data (one word per line). In this data you should
+We will use the tokenized data (one word per line). In this data you should
 also have a row number variable and a variable that defines which
 chapter/story/section the word is in. We will be using those variables
 to help us to explore sentiments in the text.
@@ -53,9 +46,11 @@ inner join keeps only those rows that are present in both data sets.
 The "by" option indicates the variable or variables that will
 be used to match the rows in the two data sets.
 
+This data is only going to include words that have sentiment values.
+
 ```{r}
 bing <- get_sentiments("bing")
-bing |> inner_join( quakersaints_long, by = "word", multiple = "all",
+bing |> inner_join( qs_tokens, by = "word", multiple = "all",
                     relationship = "many-to-many") -> qs_bing
 ```
 
@@ -66,8 +61,8 @@ table(qs_bing$sentiment) |> prop.table() |>round(2)
 
 Overall the lannguage is more negative than positive. However, in
 the Bing lexicon 70% of the entries are negative, so we wouldn't
-say that the words distribution in the Quaker stories is overly
-negative.
+say that the words distribution in the Quaker stories is necessarily
+overly negative.
 
 Interestingly, when stories appropriate for younger audiences
 are compared to those that are not, the younger-oriented 
@@ -112,20 +107,20 @@ stories. For example the 'THE MAN IN LEATHER BREECHES' story has a
 
 ```{r}
 table( qs_stories_bing$title, qs_stories_bing$sentiment) |> 
-  prop.table(1) |> round(2)
+  prop.table(1) |> round(2) |>
+  kable(caption = "Proportion of words with sentiments")
 ```
 
-This is a lot; is there a better way to display this?
-
-We can maybe trim this out to deleting columns we might not need for example the 'toc_number','text_type', and 'section_type' are columns that we don't need? Maybe use the mutate formula to get rid of them.
+Let's use a different method and sort the results.
 
 ```{r}
  qs_stories_bing |> group_by(title) |> 
-  summarize(Positive = round(sum(sentiment == "positive")/n(), 2)) |>
-  arrange(Positive) |> kable()
+  summarize(Positive = round(sum(sentiment == "positive")/n(), 2),
+            Negative = round(sum(sentiment == "negative")/n(), 2)) |>
+  arrange(Positive) |> kable(caption = "Sentiment breakdown by story")
 ```
 
-Visualizing this would be better. This is one possible way.
+Visualizing this might be better. This is one possible way.
 For yours make sure to add labels. In this case I might also want to add
 a line highlighting .5 or to change the tick marks to help visualize
 that. Do what makes sense for your data.
@@ -156,8 +151,6 @@ that. Do what makes sense for your data.
 
 ```
 
-We can also look at the relationshp between the two proportions.
-
 
 Another thing to look at will be how sentiments change during the
 stories.
@@ -167,13 +160,19 @@ we can change the visualization of the charts by giving a different graph to eac
 
 ```{r fig.height=8}
  qs_stories_bing |> 
+  # Select just the first 10 stories
   filter(title %in% unique(title)[1:10]) |>
-  arrange(row_number) |>
-  group_by(title, row_number) |>
+  # I'm going to make groups of 10 rows to do together.
+  # I could use modulo instead.
+  mutate(row_10 = round(row_number/10), 0) |>
+  arrange(row_10) |>
+  group_by(title, row_10) |>
   summarize(negative = round(sum(sentiment == "negative")/n(), 2)) |>
-ggplot( aes(x= row_number, y = negative)) +
+ggplot( aes(x= row_10, y = negative)) +
   geom_col(show.legend = FALSE) +
-  facet_wrap(~title, ncol = 2, scales = "free_x")
+  facet_wrap(~title, ncol = 2, scales = "free_x") +
+  labs(title = "Negative sentiments over the course of the stories",
+      subtitle = "Stories 1 to 10")
 ```
 
 ```{r fig.height=8}
@@ -190,27 +189,42 @@ ggplot( aes(x= row_number, y = negative)) +
 
 
 ```{r fig.height=8}
+
  qs_stories_bing |> 
-  filter(title %in% unique(title)[21:30]) |>
-  arrange(row_number) |>
-  group_by(title, row_number) |>
+  # Select just the first 10 stories
+  filter(title %in% unique(title)[11:20]) |>
+  # I'm going to make groups of 10 rows to do together.
+  # I could use modulo instead.
+  mutate(row_10 = round(row_number/10), 0) |>
+  arrange(row_10) |>
+  group_by(title, row_10) |>
   summarize(negative = round(sum(sentiment == "negative")/n(), 2)) |>
-ggplot( aes(x= row_number, y = negative)) +
+ggplot( aes(x= row_10, y = negative)) +
   geom_col(show.legend = FALSE) +
-  facet_wrap(~title, ncol = 2, scales = "free_x")
-```
-```{r fig.height=8}
- qs_stories_bing |> 
-  filter(title %in% unique(title)[31:36]) |>
-  arrange(row_number) |>
-  group_by(title, row_number) |>
-  summarize(negative = round(sum(sentiment == "negative")/n(), 2)) |>
-ggplot( aes(x= row_number, y = negative)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~title, ncol = 2, scales = "free_x")
+  facet_wrap(~title, ncol = 2, scales = "free_x") +
+  labs(title = "Negative sentiments over the course of the stories",
+      subtitle = "Stories 11 to 20")
 ```
 
+```{r fig.height=9}
 
-On your own do the same kind of analysis but using the afinn lexicon.
-You will have to think about what needs to change when you have numbers
-rather than just positive/negative.
+ qs_stories_bing |> 
+  # Select just the first 10 stories
+  filter(title %in% unique(title)[21:32]) |>
+  # I'm going to make groups of 10 rows to do together.
+  # I could use modulo instead.
+  mutate(row_10 = round(row_number/10), 0) |>
+  arrange(row_10) |>
+  group_by(title, row_10) |>
+  summarize(negative = round(sum(sentiment == "negative")/n(), 2)
+            ) |>
+ggplot( aes(x= row_10, y = negative)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~title, ncol = 2, scales = "free_x") +
+  labs(title = "Negative sentiments over the course of the stories",
+      subtitle = "Stories 21 to 32")
+```
+
+There are many additional ways we could analyze these data.
+What is useful is going to depend on your text and the questions
+you are interested in.
