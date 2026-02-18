@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style type="text/css">
+@font-face {
+font-family: octicons-link;
+src: url(data:font/woff;charset=utf-8;base64,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) format('woff');
+}
+body {
+-webkit-text-size-adjust: 100%;
+text-size-adjust: 100%;
+color: #333;
+font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+font-size: 16px;
+line-height: 1.6;
+word-wrap: break-word;
+}
+a {
+background-color: transparent;
+}
+a:active,
+a:hover {
+outline: 0;
+}
+strong {
+font-weight: bold;
+}
+h1 {
+font-size: 2em;
+margin: 0.67em 0;
+}
+img {
+border: 0;
+}
+hr {
+box-sizing: content-box;
+height: 0;
+}
+pre {
+overflow: auto;
+}
+code,
+kbd,
+pre {
+font-family: monospace, monospace;
+font-size: 1em;
+}
+input {
+color: inherit;
+font: inherit;
+margin: 0;
+}
+html input[disabled] {
+cursor: default;
+}
+input {
+line-height: normal;
+}
+input[type="checkbox"] {
+box-sizing: border-box;
+padding: 0;
+}
+table {
+border-collapse: collapse;
+border-spacing: 0;
+}
+td,
+th {
+padding: 0;
+}
+* {
+box-sizing: border-box;
+}
+input {
+font: 13px / 1.4 Helvetica, arial, nimbussansl, liberationsans, freesans, clean, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+a {
+color: #4078c0;
+text-decoration: none;
+}
+a:hover,
+a:active {
+text-decoration: underline;
+}
+hr {
+height: 0;
+margin: 15px 0;
+overflow: hidden;
+background: transparent;
+border: 0;
+border-bottom: 1px solid #ddd;
+}
+hr:before {
+display: table;
+content: "";
+}
+hr:after {
+display: table;
+clear: both;
+content: "";
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 15px;
+margin-bottom: 15px;
+line-height: 1.1;
+}
+h1 {
+font-size: 30px;
+}
+h2 {
+font-size: 21px;
+}
+h3 {
+font-size: 16px;
+}
+h4 {
+font-size: 14px;
+}
+h5 {
+font-size: 12px;
+}
+h6 {
+font-size: 11px;
+}
+blockquote {
+margin: 0;
+}
+ul,
+ol {
+padding: 0;
+margin-top: 0;
+margin-bottom: 0;
+}
+ol ol,
+ul ol {
+list-style-type: lower-roman;
+}
+ul ul ol,
+ul ol ol,
+ol ul ol,
+ol ol ol {
+list-style-type: lower-alpha;
+}
+dd {
+margin-left: 0;
+}
+code {
+font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+font-size: 12px;
+}
+pre {
+margin-top: 0;
+margin-bottom: 0;
+font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+}
+.select::-ms-expand {
+opacity: 0;
+}
+.octicon {
+font: normal normal normal 16px/1 octicons-link;
+display: inline-block;
+text-decoration: none;
+text-rendering: auto;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+.octicon-link:before {
+content: '\f05c';
+}
+.markdown-body:before {
+display: table;
+content: "";
+}
+.markdown-body:after {
+display: table;
+clear: both;
+content: "";
+}
+.markdown-body>*:first-child {
+margin-top: 0 !important;
+}
+.markdown-body>*:last-child {
+margin-bottom: 0 !important;
+}
+a:not([href]) {
+color: inherit;
+text-decoration: none;
+}
+.anchor {
+display: inline-block;
+padding-right: 2px;
+margin-left: -18px;
+}
+.anchor:focus {
+outline: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+margin-top: 1em;
+margin-bottom: 16px;
+font-weight: bold;
+line-height: 1.4;
+}
+h1 .octicon-link,
+h2 .octicon-link,
+h3 .octicon-link,
+h4 .octicon-link,
+h5 .octicon-link,
+h6 .octicon-link {
+color: #000;
+vertical-align: middle;
+visibility: hidden;
+}
+h1:hover .anchor,
+h2:hover .anchor,
+h3:hover .anchor,
+h4:hover .anchor,
+h5:hover .anchor,
+h6:hover .anchor {
+text-decoration: none;
+}
+h1:hover .anchor .octicon-link,
+h2:hover .anchor .octicon-link,
+h3:hover .anchor .octicon-link,
+h4:hover .anchor .octicon-link,
+h5:hover .anchor .octicon-link,
+h6:hover .anchor .octicon-link {
+visibility: visible;
+}
+h1 {
+padding-bottom: 0.3em;
+font-size: 2.25em;
+line-height: 1.2;
+border-bottom: 1px solid #eee;
+}
+h1 .anchor {
+line-height: 1;
+}
+h2 {
+padding-bottom: 0.3em;
+font-size: 1.75em;
+line-height: 1.225;
+border-bottom: 1px solid #eee;
+}
+h2 .anchor {
+line-height: 1;
+}
+h3 {
+font-size: 1.5em;
+line-height: 1.43;
+}
+h3 .anchor {
+line-height: 1.2;
+}
+h4 {
+font-size: 1.25em;
+}
+h4 .anchor {
+line-height: 1.2;
+}
+h5 {
+font-size: 1em;
+}
+h5 .anchor {
+line-height: 1.1;
+}
+h6 {
+font-size: 1em;
+color: #777;
+}
+h6 .anchor {
+line-height: 1.1;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+table,
+pre {
+margin-top: 0;
+margin-bottom: 16px;
+}
+hr {
+height: 4px;
+padding: 0;
+margin: 16px 0;
+background-color: #e7e7e7;
+border: 0 none;
+}
+ul,
+ol {
+padding-left: 2em;
+}
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+margin-top: 0;
+margin-bottom: 0;
+}
+li>p {
+margin-top: 16px;
+}
+dl {
+padding: 0;
+}
+dl dt {
+padding: 0;
+margin-top: 16px;
+font-size: 1em;
+font-style: italic;
+font-weight: bold;
+}
+dl dd {
+padding: 0 16px;
+margin-bottom: 16px;
+}
+blockquote {
+padding: 0 15px;
+color: #777;
+border-left: 4px solid #ddd;
+}
+blockquote>:first-child {
+margin-top: 0;
+}
+blockquote>:last-child {
+margin-bottom: 0;
+}
+table {
+display: block;
+width: 100%;
+overflow: auto;
+word-break: normal;
+word-break: keep-all;
+}
+table th {
+font-weight: bold;
+}
+table th,
+table td {
+padding: 6px 13px;
+border: 1px solid #ddd;
+}
+table tr {
+background-color: #fff;
+border-top: 1px solid #ccc;
+}
+table tr:nth-child(2n) {
+background-color: #f8f8f8;
+}
+img {
+max-width: 100%;
+box-sizing: content-box;
+background-color: #fff;
+}
+code {
+padding: 0;
+padding-top: 0.2em;
+padding-bottom: 0.2em;
+margin: 0;
+font-size: 85%;
+background-color: rgba(0,0,0,0.04);
+border-radius: 3px;
+}
+code:before,
+code:after {
+letter-spacing: -0.2em;
+content: "\00a0";
+}
+pre>code {
+padding: 0;
+margin: 0;
+font-size: 100%;
+word-break: normal;
+white-space: pre;
+background: transparent;
+border: 0;
+}
+.highlight {
+margin-bottom: 16px;
+}
+.highlight pre,
+pre {
+padding: 16px;
+overflow: auto;
+font-size: 85%;
+line-height: 1.45;
+background-color: #f7f7f7;
+border-radius: 3px;
+}
+.highlight pre {
+margin-bottom: 0;
+word-break: normal;
+}
+pre {
+word-wrap: normal;
+}
+pre code {
+display: inline;
+max-width: initial;
+padding: 0;
+margin: 0;
+overflow: initial;
+line-height: inherit;
+word-wrap: normal;
+background-color: transparent;
+border: 0;
+}
+pre code:before,
+pre code:after {
+content: normal;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font-size: 11px;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.pl-c {
+color: #969896;
+}
+.pl-c1,
+.pl-s .pl-v {
+color: #0086b3;
+}
+.pl-e,
+.pl-en {
+color: #795da3;
+}
+.pl-s .pl-s1,
+.pl-smi {
+color: #333;
+}
+.pl-ent {
+color: #63a35c;
+}
+.pl-k {
+color: #a71d5d;
+}
+.pl-pds,
+.pl-s,
+.pl-s .pl-pse .pl-s1,
+.pl-sr,
+.pl-sr .pl-cce,
+.pl-sr .pl-sra,
+.pl-sr .pl-sre {
+color: #183691;
+}
+.pl-v {
+color: #ed6a43;
+}
+.pl-id {
+color: #b52a1d;
+}
+.pl-ii {
+background-color: #b52a1d;
+color: #f8f8f8;
+}
+.pl-sr .pl-cce {
+color: #63a35c;
+font-weight: bold;
+}
+.pl-ml {
+color: #693a17;
+}
+.pl-mh,
+.pl-mh .pl-en,
+.pl-ms {
+color: #1d3e81;
+font-weight: bold;
+}
+.pl-mq {
+color: #008080;
+}
+.pl-mi {
+color: #333;
+font-style: italic;
+}
+.pl-mb {
+color: #333;
+font-weight: bold;
+}
+.pl-md {
+background-color: #ffecec;
+color: #bd2c00;
+}
+.pl-mi1 {
+background-color: #eaffea;
+color: #55a532;
+}
+.pl-mdr {
+color: #795da3;
+font-weight: bold;
+}
+.pl-mo {
+color: #1d3e81;
+}
+kbd {
+display: inline-block;
+padding: 3px 5px;
+font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
+line-height: 10px;
+color: #555;
+vertical-align: middle;
+background-color: #fcfcfc;
+border: solid 1px #ccc;
+border-bottom-color: #bbb;
+border-radius: 3px;
+box-shadow: inset 0 -1px 0 #bbb;
+}
+.task-list-item {
+list-style-type: none;
+}
+.task-list-item+.task-list-item {
+margin-top: 3px;
+}
+.task-list-item input {
+margin: 0 0.35em 0.25em -1.6em;
+vertical-align: middle;
+}
+:checked+.radio-label {
+z-index: 1;
+position: relative;
+border-color: #4078c0;
+}
+.sourceLine {
+display: inline-block;
+}
+code .kw { color: #000000; }
+code .dt { color: #ed6a43; }
+code .dv { color: #009999; }
+code .bn { color: #009999; }
+code .fl { color: #009999; }
+code .ch { color: #009999; }
+code .st { color: #183691; }
+code .co { color: #969896; }
+code .ot { color: #0086b3; }
+code .al { color: #a61717; }
+code .fu { color: #63a35c; }
+code .er { color: #a61717; background-color: #e3d2d2; }
+code .wa { color: #000000; }
+code .cn { color: #008080; }
+code .sc { color: #008080; }
+code .vs { color: #183691; }
+code .ss { color: #183691; }
+code .im { color: #000000; }
+code .va {color: #008080; }
+code .cf { color: #000000; }
+code .op { color: #000000; }
+code .bu { color: #000000; }
+code .ex { color: #000000; }
+code .pp { color: #999999; }
+code .at { color: #008080; }
+code .do { color: #969896; }
+code .an { color: #008080; }
+code .cv { color: #008080; }
+code .in { color: #008080; }
+</style>
+<style>
+body {
+box-sizing: border-box;
+min-width: 200px;
+max-width: 980px;
+margin: 0 auto;
+padding: 45px;
+padding-top: 0px;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<h1 id="curating-the-data-part-1">Curating the data, part 1</h1>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(here)</span></code></pre></div>
+<p>This document contains the process of going back to the
+<code>quakersaints</code> data and cleaning it up. This way the
+tokenization process will ultimately give us the data that we really
+want to analyze.</p>
+<p>It’s important to know that this is an <em>iterative</em> process.
+That is that you will find yourself going back to the beginning and
+making changes or realizing that you left out an important step that you
+need later. So some of the work you will see here is the product of me
+having gone through the data set many times. Just like any kind of
+creative work, you may need to make corrections, reorganize or sometimes
+go back to the beginning and make adjustments.</p>
+<p>I have also looked at the book itself to understand its
+structure.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># If the file of saved data is not present</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">file.exists</span>(<span class="fu">here</span>(<span class="st">&quot;data/quakersaints.rda&quot;</span>))) {</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>     <span class="co"># download the data from Project Gutenberg</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>     quakersaints <span class="ot">&lt;-</span>  <span class="fu">gutenberg_download</span>(<span class="fu">c</span>(<span class="dv">19605</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>     <span class="co"># and save it to that file name.</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>     <span class="fu">save</span>(quakersaints, <span class="at">file=</span><span class="st">&quot;data/quakersaints.rda&quot;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># Otherwise, </span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>     <span class="co"># load the data set from the file.</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>     <span class="fu">load</span>(<span class="fu">here</span>(<span class="st">&quot;data/quakersaints.rda&quot;</span>))</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>}</span></code></pre></div>
+<p>Looking specifically at this book, I notice first that there are the
+standard Project Gutenberg texts at the beginning. There is also the
+title page and a list of other books and dedcation. These end at line
+81. This section is followed by an preface which starts on line 82 and
+ends on line 182.</p>
+<p>Then from 192 to 260 there is a table of contents with blank lines.
+Also * in the title indicates “for younger children.”</p>
+<p>Then come the stories.</p>
+<p>I would like to separate each of the stories so that later I can
+compare them. However I really don’t want the Table of Contents itself
+in my final data.</p>
+<p>Finally, from line 15189 to the end is also Project Gutenberg
+content.</p>
+<p>Using this information, I can modify the data to get what I want.</p>
+<p>A useful first step is to add a variable to the data that identifies
+the original row that the data came from. This will turn out to be
+really helpful for finding information in the original data and it also
+is data about the order in which things appear. Later, when we go back
+to <code>unnest_tokens()</code> this information will be associated with
+each token.</p>
+<p>Note that because this isn’t saving this copy of
+<code>quakersaints</code> so if we make a mistake, we can always go back
+and reload the original saved file.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>quakersaints <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">row_number =</span> <span class="fu">row_number</span>()) <span class="ot">-&gt;</span> quakersaints</span></code></pre></div>
+<p>I can subset the data so that it only includes lines 82 to 15188. I’m
+going to call the new data set <code>quakersaints_trimmed</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>quakersaints <span class="sc">|&gt;</span> </span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">filter</span>(row_number <span class="sc">&gt;</span> <span class="dv">81</span> <span class="sc">&amp;</span> row_number <span class="sc">&lt;</span> <span class="dv">15189</span>) <span class="ot">-&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  quakersaints_trimmed</span></code></pre></div>
+<p>I want to break my text into chapters. I also can see that there are
+different types of text. For example, the Preface and Historical Notes
+are not stories. Also “COME-TO-GOOD” and ” A TALK ABOUT SAINTS” Do not
+have roman numerals. A closer look at the text reveals that these are
+not stories but are thoughts from the author directly addressed to the
+reader.</p>
+<p>One thing that I also note about the book is that each story has a
+section before the story it self that consists of powms, quotations and
+other items. I would like to be able to separate those out, while
+keeping track of which epigraph goes with each story.</p>
+<p>There are multiple ways that you can approach this. In ths esample I
+am going to start by working with the table of contents. Since the
+titles appear both in the table of contents and at the beginning of each
+chapter and epigraph. I know this because I looked at the layout of the
+book in both the data file and in the html version of the book on the
+Project Gutenberg website. I also note that the title is repeated before
+both the epigraph and the man text.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>table_of_contents <span class="ot">&lt;-</span> quakersaints <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>                     <span class="fu">filter</span>(row_number <span class="sc">&gt;=</span> <span class="dv">190</span> <span class="sc">&amp;</span> row_number <span class="sc">&lt;=</span><span class="dv">260</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>                     <span class="fu">filter</span>(text <span class="sc">!=</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>table_of_contents<span class="sc">$</span>text</span></code></pre></div>
+<pre><code>##  [1] &quot;          PREFACE                                             _page_ vii&quot;
+##  [2] &quot;*         A TALK ABOUT SAINTS                                        1&quot;  
+##  [3] &quot;*      I. &#39;STIFF AS A TREE, PURE AS A BELL&#39;                         19&quot;  
+##  [4] &quot;*     II. &#39;PURE FOY, MA JOYE&#39;                                       33&quot;  
+##  [5] &quot;*    III. THE ANGEL OF BEVERLEY                                     57&quot;  
+##  [6] &quot;*     IV. TAMING THE TIGER                                          79&quot;  
+##  [7] &quot;*      V. &#39;THE MAN IN LEATHER BREECHES&#39;                             97&quot;  
+##  [8] &quot;      VI. THE SHEPHERD OF PENDLE HILL                              111&quot;  
+##  [9] &quot;     VII. THE PEOPLE IN WHITE RAIMENT                              121&quot;  
+## [10] &quot;    VIII. A WONDERFUL FORTNIGHT                                    131&quot;  
+## [11] &quot;      IX. UNDER THE YEW-TREES                                      149&quot;  
+## [12] &quot;       X. &#39;BEWITCHED!&#39;                                             163&quot;  
+## [13] &quot;      XI. THE JUDGE&#39;S RETURN                                       175&quot;  
+## [14] &quot;*    XII. &#39;STRIKE AGAIN!&#39;                                          185&quot;  
+## [15] &quot;*   XIII. MAGNANIMITY                                              197&quot;  
+## [16] &quot;*    XIV. MILES HALHEAD AND THE HAUGHTY LADY                       209&quot;  
+## [17] &quot;      XV. SCATTERING THE SEED                                      223&quot;  
+## [18] &quot;     XVI. WRESTLING FOR GOD                                        239&quot;  
+## [19] &quot;    XVII. LITTLE JAMES AND HIS JOURNEYS                            255&quot;  
+## [20] &quot;   XVIII. THE FIRST QUAKER MARTYR                                  271&quot;  
+## [21] &quot;*    XIX. THE CHILDREN OF READING MEETING                          285&quot;  
+## [22] &quot;*     XX. THE SADDEST STORY OF ALL                                 301&quot;  
+## [23] &quot;*    XXI. PALE WINDFLOWERS                                         321&quot;  
+## [24] &quot;    XXII. AN UNDISTURBED MEETING                                   343&quot;  
+## [25] &quot;   XXIII. BUTTERFLIES IN THE FELLS                                 353&quot;  
+## [26] &quot;    XXIV. THE VICTORY OF AMOR STODDART                             367&quot;  
+## [27] &quot;*    XXV. THE MARVELLOUS VOYAGE OF THE GOOD SHIP &#39;WOODHOUSE&#39;       379&quot;  
+## [28] &quot;*   XXVI. RICHARD SELLAR AND THE &#39;MERCIFUL MAN&#39;                    403&quot;  
+## [29] &quot;*  XXVII. TWO ROBBER STORIES--WEST AND EAST                        427&quot;  
+## [30] &quot;  XXVIII. SILVER SLIPPERS: OR A QUAKERESS AMONG THE TURKS          441&quot;  
+## [31] &quot;*   XXIX. FIERCE FEATHERS                                          465&quot;  
+## [32] &quot;*    XXX. THE THIEF IN THE TANYARD                                 479&quot;  
+## [33] &quot;    XXXI. HOW A FRENCH NOBLE BECAME A FRIEND                       489&quot;  
+## [34] &quot;   XXXII. PREACHING TO NOBODY                                      509&quot;  
+## [35] &quot;          COME-TO-GOOD                                             523&quot;  
+## [36] &quot;          HISTORICAL NOTES                                         539&quot;</code></pre>
+<p>Looking at these results I see that there is work I have to do in
+order to make it possible to match the titles here with the titles in
+the rest of the text.</p>
+<p>First, I want to take off the “*” characters, but I want to create a
+new variable called <code>younger</code> that indicates which stories
+were classified that way, I want to the remove the page numbers from
+each line, including the “<em>page</em> vii” from the lines.</p>
+<p>I also notice that there is “white space”, probably ” ” characters,
+that I want to remove. I also want to indicate which of the chapters are
+not stories and which are the sections beore the chapters (Front Matter)
+and after them (Back Matter).</p>
+<p>To make things easier to read, I’ll break out the steps, although
+they could be put together using one big <code>mutate()</code>. While
+you are working, it often makes it easier to check for errors to do
+this.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># add the indicator for younger audiences</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>table_of_contents <span class="ot">&lt;-</span> table_of_contents <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>                     <span class="fu">mutate</span>(<span class="at">younger =</span> <span class="fu">substr</span>(text, <span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">==</span> <span class="st">&quot;*&quot;</span>)</span></code></pre></div>
+<p>Next, let’s create a variable that indicates these are titles. This
+will be useful later, when we want to separate titles from text.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>table_of_contents <span class="ot">&lt;-</span> table_of_contents <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">title =</span> <span class="st">&quot;Title&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Remove numbers (could also use &quot;[0-9]+&quot;)</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>table_of_contents <span class="ot">&lt;-</span> table_of_contents <span class="sc">|&gt;</span> </span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span><span class="fu">gsub</span>(<span class="st">&quot;[[:digit:]]+&quot;</span>, <span class="st">&quot;&quot;</span>, text))</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co"># Deal with a special case</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>table_of_contents <span class="ot">&lt;-</span> table_of_contents <span class="sc">|&gt;</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">sub</span>(<span class="st">&quot;_page_ vii&quot;</span>, <span class="st">&quot;&quot;</span>, text, <span class="at">fixed =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co"># Remove *</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>table_of_contents <span class="ot">&lt;-</span> table_of_contents <span class="sc">|&gt;</span> </span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span> <span class="fu">sub</span>(<span class="st">&quot;*&quot;</span>, <span class="st">&quot;&quot;</span>, text, <span class="at">fixed=</span><span class="cn">TRUE</span>))</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co"># Remove extra white space</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>table_of_contents <span class="ot">&lt;-</span> table_of_contents <span class="sc">|&gt;</span> </span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">text =</span><span class="fu">trimws</span>(text))</span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>table_of_contents<span class="sc">$</span>text</span></code></pre></div>
+<pre><code>##  [1] &quot;PREFACE&quot;                                                
+##  [2] &quot;A TALK ABOUT SAINTS&quot;                                    
+##  [3] &quot;I. &#39;STIFF AS A TREE, PURE AS A BELL&#39;&quot;                   
+##  [4] &quot;II. &#39;PURE FOY, MA JOYE&#39;&quot;                                
+##  [5] &quot;III. THE ANGEL OF BEVERLEY&quot;                             
+##  [6] &quot;IV. TAMING THE TIGER&quot;                                   
+##  [7] &quot;V. &#39;THE MAN IN LEATHER BREECHES&#39;&quot;                       
+##  [8] &quot;VI. THE SHEPHERD OF PENDLE HILL&quot;                        
+##  [9] &quot;VII. THE PEOPLE IN WHITE RAIMENT&quot;                       
+## [10] &quot;VIII. A WONDERFUL FORTNIGHT&quot;                            
+## [11] &quot;IX. UNDER THE YEW-TREES&quot;                                
+## [12] &quot;X. &#39;BEWITCHED!&#39;&quot;                                        
+## [13] &quot;XI. THE JUDGE&#39;S RETURN&quot;                                 
+## [14] &quot;XII. &#39;STRIKE AGAIN!&#39;&quot;                                   
+## [15] &quot;XIII. MAGNANIMITY&quot;                                      
+## [16] &quot;XIV. MILES HALHEAD AND THE HAUGHTY LADY&quot;                
+## [17] &quot;XV. SCATTERING THE SEED&quot;                                
+## [18] &quot;XVI. WRESTLING FOR GOD&quot;                                 
+## [19] &quot;XVII. LITTLE JAMES AND HIS JOURNEYS&quot;                    
+## [20] &quot;XVIII. THE FIRST QUAKER MARTYR&quot;                         
+## [21] &quot;XIX. THE CHILDREN OF READING MEETING&quot;                   
+## [22] &quot;XX. THE SADDEST STORY OF ALL&quot;                           
+## [23] &quot;XXI. PALE WINDFLOWERS&quot;                                  
+## [24] &quot;XXII. AN UNDISTURBED MEETING&quot;                           
+## [25] &quot;XXIII. BUTTERFLIES IN THE FELLS&quot;                        
+## [26] &quot;XXIV. THE VICTORY OF AMOR STODDART&quot;                     
+## [27] &quot;XXV. THE MARVELLOUS VOYAGE OF THE GOOD SHIP &#39;WOODHOUSE&#39;&quot;
+## [28] &quot;XXVI. RICHARD SELLAR AND THE &#39;MERCIFUL MAN&#39;&quot;            
+## [29] &quot;XXVII. TWO ROBBER STORIES--WEST AND EAST&quot;               
+## [30] &quot;XXVIII. SILVER SLIPPERS: OR A QUAKERESS AMONG THE TURKS&quot;
+## [31] &quot;XXIX. FIERCE FEATHERS&quot;                                  
+## [32] &quot;XXX. THE THIEF IN THE TANYARD&quot;                          
+## [33] &quot;XXXI. HOW A FRENCH NOBLE BECAME A FRIEND&quot;               
+## [34] &quot;XXXII. PREACHING TO NOBODY&quot;                             
+## [35] &quot;COME-TO-GOOD&quot;                                           
+## [36] &quot;HISTORICAL NOTES&quot;</code></pre>
+<p>Next, I’ll create a variable that indicates whether the title is for
+a story, front matter or back matter. This uses a function called
+<code>case_when()</code> that lets us set up more complex rules.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>  table_of_contents <span class="ot">&lt;-</span> table_of_contents <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">text_type  =</span> <span class="fu">case_when</span> (</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>                  text <span class="sc">%in%</span>   <span class="fu">c</span>(<span class="st">&quot;PREFACE&quot;</span>, <span class="st">&quot;A TALK ABOUT SAINTS&quot;</span>) <span class="sc">~</span> </span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>                                          <span class="st">&quot;Front Matter&quot;</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>                            text <span class="sc">%in%</span> </span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>                               <span class="fu">c</span>(<span class="st">&quot;HISTORICAL NOTES&quot;</span>, <span class="st">&quot;COME-TO-GOOD&quot;</span>) <span class="sc">~</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>                                    <span class="st">&quot;Back Matter&quot;</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>                         <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;Story&quot;</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>                  )</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">head</span>(table_of_contents)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 6
+##   gutenberg_id text                       row_number younger title text_type
+##          &lt;int&gt; &lt;chr&gt;                           &lt;int&gt; &lt;lgl&gt;   &lt;chr&gt; &lt;chr&gt;    
+## 1        19605 PREFACE                           190 FALSE   Title Front Ma…
+## 2        19605 A TALK ABOUT SAINTS               192 TRUE    Title Front Ma…
+## 3        19605 I. &#39;STIFF AS A TREE, PURE…        194 TRUE    Title Story    
+## 4        19605 II. &#39;PURE FOY, MA JOYE&#39;           196 TRUE    Title Story    
+## 5        19605 III. THE ANGEL OF BEVERLEY        198 TRUE    Title Story    
+## 6        19605 IV. TAMING THE TIGER              200 TRUE    Title Story</code></pre>
+<p>This shows how to do takes some first steps toward combining the
+above steps into a longer piped sequence.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>table_of_contents <span class="ot">&lt;-</span> table_of_contents <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>                     <span class="fu">mutate</span>(<span class="at">title =</span> <span class="st">&quot;Title&quot;</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>                            <span class="at">younger =</span> <span class="fu">substr</span>(text, <span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">==</span> <span class="st">&quot;*&quot;</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>                            <span class="at">title =</span> <span class="st">&quot;Title&quot;</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>                            <span class="at">text_type  =</span> <span class="fu">case_when</span> (</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>                                         text <span class="sc">%in%</span>  <span class="fu">c</span>(<span class="st">&quot;PREFACE&quot;</span>, <span class="st">&quot;A TALK ABOUT SAINTS&quot;</span>) <span class="sc">~</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>                                          <span class="st">&quot;Front Matter&quot;</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>                                          text <span class="sc">%in%</span>  <span class="fu">c</span>(<span class="st">&quot;HISTORICAL NOTES&quot;</span>, <span class="st">&quot;COME-TO-GOOD&quot;</span>) <span class="sc">~</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>                                    <span class="st">&quot;Back Matter&quot;</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>                                          <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;Story&quot;</span>),</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>                            <span class="at">text =</span><span class="fu">gsub</span>(<span class="st">&quot;[[:digit:]]+&quot;</span>, <span class="st">&quot;&quot;</span>, text),</span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>                            <span class="at">text =</span> <span class="fu">sub</span>(<span class="st">&quot;_page_ vii&quot;</span>, <span class="st">&quot;&quot;</span>, </span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>                                       text, <span class="at">fixed =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a>                            <span class="at">text =</span> <span class="fu">trimws</span>(</span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>                              <span class="fu">sub</span>(<span class="st">&quot;*&quot;</span>, <span class="st">&quot;&quot;</span>, text, <span class="at">fixed=</span><span class="cn">TRUE</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>                              ),</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>                  </span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>                            )</span></code></pre></div>
+<p>Now we can use <code>table_of_contents</code> to find the lines in
+<code>quaker_saints</code>_trimmed that contain titles by matching the
+<code>text</code> values. There are (as usual) lots of ways to do this.
+I’ll do it with a left join.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>table_of_contents <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>  <span class="fu">left_join</span>(quakersaints_trimmed, <span class="at">by =</span> <span class="st">&quot;text&quot;</span>)</span></code></pre></div>
+<p>This gives us a data set with some unexpected results.</p>
+<p>First, instead of row_number we have two variables: row_number.x and
+row_number.y. These numbers are different because they represent the row
+numbers from the table of contents and the row numbers from the original
+text. We also have gutenberg_id.x and gutenberg_id.y which is the same,
+because both the table of contents and the text came from the same
+original file.</p>
+<p>Also, except for the Preface there are two copies of each title. This
+is because the epigraphs and the stories both have the titles where they
+start.</p>
+<p>This time we will remove the gutenberg_id and row_number before doing
+the join.</p>
+<p><code>title_row</code> represents the row number where a match to the
+title in the table of contents was found.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>table_of_contents <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>gutenberg_id)  <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="fu">left_join</span>(quakersaints_trimmed, <span class="at">by =</span> <span class="st">&quot;text&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">title_row =</span> row_number) <span class="ot">-&gt;</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  table_of_contents</span></code></pre></div>
+<p>One thing that we can notice is that two of the titles don’t seem to
+match anything in the <code>quakersaints_trimmed</code>:<br />
+XXI. PALE WINDFLOWERS<br />
+XXVII. TWO ROBBER STORIES–WEST AND EAST</p>
+<p>If we look back at the original text (<a href="https://www.gutenberg.org/cache/epub/19605/">https://www.gutenberg.org/cache/epub/19605/</a>
+we can see that in the body of the book, the titles are slightly
+different.</p>
+<ol start="21" style="list-style-type: decimal">
+<li>PALE WIND FLOWERS: OR THE LITTLE PRISON MAID</li>
+<li>TWO ROBBER STORIES. WEST AND EAST</li>
+</ol>
+<p>Probably the simplest thing to do is to chang the table of contents
+version to match that in the text.</p>
+<p>For this it is probably simplest to use base R. It took some work to
+find the exact right punctuation for each. This changes the specific
+rows to match exactly.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>table_of_contents<span class="sc">$</span>text[table_of_contents<span class="sc">$</span>text <span class="sc">==</span> </span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>                         <span class="st">&quot;XXI. PALE WINDFLOWERS&quot;</span>] <span class="ot">&lt;-</span></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>  <span class="st">&quot;XXI. PALE WIND FLOWERS: OR THE LITTLE PRISON MAID&quot;</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>table_of_contents<span class="sc">$</span>text[table_of_contents<span class="sc">$</span>text <span class="sc">%in%</span> <span class="fu">c</span>( </span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>                         <span class="st">&quot;XXVII. TWO ROBBER STORIES--WEST AND EAST&quot;</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>                         <span class="st">&quot;XXVII. TWO ROBBER STORIES-WEST AND EAST&quot;</span></span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>                         )] <span class="ot">&lt;-</span></span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>  <span class="st">&quot;XXVII. TWO ROBBER STORIES. WEST AND EAST&quot;</span></span></code></pre></div>
+<p>Now I can try the matching again.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>table_of_contents <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">toc_row =</span> row_number) <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>gutenberg_id)  <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>  <span class="fu">left_join</span>(quakersaints_trimmed, <span class="at">by =</span> <span class="st">&quot;text&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">title_row =</span> row_number) <span class="ot">-&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>  table_of_contents</span></code></pre></div>
+<p>This still leaves us with two copies of most of the titles. We can
+number these and in most cases use the numbers to indicate whether they
+represent epigraphs or the main texts. We will use some custom code to
+handle the fact that the Preface does not have an epigraph.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>table_of_contents <span class="sc">|&gt;</span> </span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>  <span class="fu">group_by</span>(text) <span class="sc">|&gt;</span> </span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">title_number =</span> <span class="fu">row_number</span>(),</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>         <span class="at">title_type =</span> <span class="fu">case_when</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>                         text <span class="sc">==</span> <span class="st">&quot;PREFACE&quot;</span> <span class="sc">~</span> <span class="st">&quot;main&quot;</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>                         title_number <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;epigraph&quot;</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>                         title_number <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;main&quot;</span></span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>         )) <span class="sc">|&gt;</span></span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> </span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>  table_of_contents</span></code></pre></div>
+<p>Finally, and most important, we want to connect the
+<code>table_of_contents</code> information to the
+<code>quakesaints_trimmed</code> data.</p>
+<p>Again this required some thinking and experimentation to develop a
+procedure for. This is because if you just join on “text” you end up
+with 4 copies of each title instead of two.</p>
+<p>First I am going create a new variable by copying the value of text
+in the <code>table_of_contents</code> data.</p>
+<p>We do not need the row_number from the table of contents in order to
+work with the text data.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>table_of_contents <span class="sc">|&gt;</span> </span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">section_title =</span> text) <span class="ot">-&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>  table_of_contents</span></code></pre></div>
+<p>Now we can join, but instead of using a simple <code>by</code>
+option, we use the function <code>join_by</code> variables that have
+different names (and more than one variable at the same time.) The
+<code>arrange()</code> function is used to ensure that the resulting
+data set is in the original order.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>quakersaints_trimmed <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>  <span class="fu">left_join</span>(table_of_contents,</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>             <span class="at">by =</span> <span class="fu">join_by</span>( <span class="st">&quot;text&quot;</span> <span class="sc">==</span> <span class="st">&quot;text&quot;</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>                           <span class="st">&quot;row_number&quot;</span> <span class="sc">==</span> <span class="st">&quot;title_row&quot;</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>                           <span class="st">&quot;gutenberg_id&quot;</span> <span class="sc">==</span> <span class="st">&quot;gutenberg_id&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>  <span class="fu">arrange</span>(row_number) <span class="ot">-&gt;</span></span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>  quakersaints_trimmed</span></code></pre></div>
+<p>Now we have the same 15,107 rows that we started with in
+<code>quakersaints_trimmed</code>.<br />
+However, a look at the data shows us that there are many missing values.
+Every row that was not a title is missing on most variables. For one,
+<code>title</code>, we would like to label all of the rest of the rows
+as <code>text</code>.<br />
+For most of the others (“younger”, “text_type”, and “title_type” ) we
+want every row in the connected text to have the same values.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>quakersaints_trimmed <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">title =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(title) <span class="sc">==</span> <span class="cn">TRUE</span>, </span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>                                             <span class="st">&quot;Text&quot;</span>, <span class="st">&quot;Title&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>                        <span class="fu">fill</span>(text_type) <span class="sc">|&gt;</span> </span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>                        <span class="fu">fill</span>(title_type) <span class="sc">|&gt;</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a>                        <span class="fu">fill</span>(section_title) <span class="sc">|&gt;</span></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>                        <span class="fu">fill</span>(younger) <span class="ot">-&gt;</span> </span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a>  quakersaints_trimmed </span></code></pre></div>
+<p>I’m going to save <code>quakersaints_trimmed</code> so that we can
+use the new data set, with all its extra information to tokenize and
+also to compare types of text and specific stories to each other.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">save</span>(quakersaints_trimmed, <span class="at">file =</span> <span class="fu">here</span>(<span class="st">&quot;data/quakersaints_trimmed.rda&quot;</span>))</span></code></pre></div>
+
+</body>
+</html>
