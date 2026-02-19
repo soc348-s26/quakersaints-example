@@ -66,7 +66,7 @@ This data is only going to include words that have sentiment values.
 
 ```{r}
 nrc <- get_sentiments("nrc")
-nrc |> inner_join( quakersaints_long, by = "word", multiple = "all",
+nrc |> inner_join(qs_tokens, by = "word", multiple = "all",
                    relationship = "many-to-many") -> qs_nrc
 ```
 
@@ -121,10 +121,10 @@ In this case we could just focus on the emotion words.
 
 ```{r}
 qs_nrc |> filter (!sentiment %in% c("positive", "negative") ) |>
-  group_by(title, sentiment) |> 
+  group_by(section_title, sentiment) |> 
   summarize(n = n()) |>
   ungroup() |>
-  group_by(title) |>
+  group_by(section_title) |>
     arrange(n) |>
   slice_tail(n =1) |>
   kable(caption = "Most common emotion in each story")
