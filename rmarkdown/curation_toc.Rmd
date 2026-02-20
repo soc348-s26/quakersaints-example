@@ -243,8 +243,8 @@ the table of contents was found.
 ```{r eval=FALSE}
 table_of_contents |>
   select(-gutenberg_id)  |>
-  left_join(quakersaints_trimmed, by = "text") |>
-  rename(title_row = row_number) ->
+  rename(title_row = row_number) |>
+  left_join(quakersaints_trimmed, by = "text")  ->
   table_of_contents
 ```
 

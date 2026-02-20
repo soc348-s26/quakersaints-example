@@ -17,7 +17,11 @@ To load the saved dataset I use the `load()` function.
 # If the file of saved data is not present
 if (!file.exists(here("data/quakersaints.rda"))) {
      # download the data from Project Gutenberg
-     quakersaints <-  gutenberg_download(c(19605))
+     quakersaints <-  gutenberg_download(c(29558))
+     # If the download doesn't work because the default is not available
+     # use a mirror from here https://www.gutenberg.org/MIRRORS.ALL
+     # quakersaints <-  gutenberg_download(c(29558), 
+     # mirror = "https://mirror.cs.odu.edu/gutenberg")
      # and save it to that file name.
      save(quakersaints, file="data/quakersaints.rda")
 # Otherwise, 
