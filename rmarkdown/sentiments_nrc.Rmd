@@ -142,3 +142,7 @@ head(unique(trustwords$word), 20)
 
 ```
 
+```{r}
+save(qs_nrc, file = here("data/qs_nrc.rda"))
+```
+
