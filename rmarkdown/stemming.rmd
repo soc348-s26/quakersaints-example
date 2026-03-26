@@ -1,0 +1,46 @@
+Stemming is the process of reducing a word to it's "stem" which then allows us to do things such as treat "walk", "walked" and "walking" as the same words.
+This gives us better or at least different understanding of the most frequent words.
+
+Porter2 Snowball stemming  
+
+Review this page 
+[https://snowballstem.org/algorithms/english/stemmer.html]
+
+```{r}
+library(SnowballC)
+
+```
+
+```{r}
+wordStem(c("win", "winning", "winner"))
+wordStem(c("call", "calling", "called"))
+```
+```{r}
+getStemLanguages()
+```
+
+This will generate a data frame of words and stems for specific languages.
+
+```{r}
+
+lang <- "english"
+load(system.file("words", paste0(lang, ".RData"), package="SnowballC"))
+
+```
+Do you think they are resonable? 
+
+
+Also load your long data.
+
+Use the wordStem(words, language = "english") function to create a new version of your long data with the stemmed words.   
+(Note that this function is in the quatenda package with the name tokens_wordstem or dfm_wordstem for dfm objects).
+
+
+```{r}
+wordStem(quakersaints_long$word) -> quakersaints_long$word_stemmed
+
+# quakersaints_long |> mutate(word_stemmed = wordStem(word)) -> quakersaints_long
+```
+
+Now rerun you analysis of the top words.  Do any rankings change when you 
+use the stemmed words instead of the unstemmed words? 
