@@ -58,6 +58,7 @@ qs_tokens |> count(word_stemmed, sort = TRUE) |>
 
 ```{r}
 qs_tokens |> count(word, sort = TRUE) |>
+  # Pick a cutoff number that gives you a readable graph.
   filter(n > 200) |>
   mutate(word = reorder(word, n)) |>
      

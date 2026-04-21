@@ -27,6 +27,9 @@ if (!file.exists(here("data/quakersaints_trimmed.rda"))) {
 ```
 
 
+
+
+
 ```{r}
 quakersaints_trimmed |> 
   unnest_tokens(output=word, input = text, token = "words") ->
@@ -88,7 +91,7 @@ stories.
 qs_tokens |> filter(text_type == "Story" & title_type =="main"
                     ) |>
              group_by(section_title) |>
-             summarize(uses = sum(word == "fox")) |>
+             summarize(uses = sum(word == "george_fox")) |>
              kable(caption = "Presence of 'fox' by story")
 ```
 
@@ -168,7 +171,7 @@ This is an example of how any text you are working with may have
 very specific issues that may need to be considered.
 
 ```{r}
-quaker_words <- c("thou", "thee", "thy", "art", "hast", "thine")
+quaker_words <- c("thou", "thee", "thy", "art", "hast", "thine", "wilt")
 qs_tokens |> mutate(quaker_word = ifelse(word %in% quaker_words, 
                                          "Yes", "No")) -> qs_tokens
 
