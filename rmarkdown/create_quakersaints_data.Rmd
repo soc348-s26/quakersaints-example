@@ -2,6 +2,12 @@
 title: "Initial steps"
 output: html_document
 ---
+```{r}
+library(here)
+library(ggplot2)
+library(dplyr)
+```
+
 
 This file will go through the very basic step, with minimal cleaning.
 It will also create 
