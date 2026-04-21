@@ -64,6 +64,8 @@ library(wordcloud)
 library(kableExtra)
 library(ggrepel)
 library(pagedown)
+library(cluster)
+library(factoextra)
 ```
 ```{r}
 load(here("data/qs_tokens.rda"))
@@ -152,18 +154,38 @@ two potential meanings: Quakers are also called Friends and the ordinary
 meaning of a person someone is friends with, which might be common in
 stories for children.
 
+# George Fox and Quaker words
+
+Although Quaker words is concentrated in a few stories. In 
+particular "Pale Windflowers" uses 118 of them. The story
+is about the important early Quaker leader William Dewsbury 
+and his grand daughter. Most 
+of the Quaker words are part of dialoues between them or with
+her mother or aunt. 
+
+```{r}
+qs_tokens |>  
+  filter(text_type == "Story" & title_type == "main") |>
+  group_by(section_title) |>
+  summarize(`George Fox` = sum(word == "george_fox"), 
+            `Quaker Words` = sum(quaker_word == "Yes")) ->
+  quaker_counts
+#quaker_counts |>
+#        kable(caption = "Presence of 'George Fox' and Quaker Words by story")
+```
+
+```{r}
+ggplot(quaker_counts, aes(x = `George Fox`, y = `Quaker Words`))  +
+  geom_point() +
+  labs(title = "Counts of George Fox and Quaker Words")
+```
+
+
 # Sentiment Analysis
 
 Sentiment analysis provides a way to interpret the words used in a body
 of text. It uses standard lexicons
 to characterize individual words used. 
-
-
-
-One idea that is
-explored is whether stories that are labelled as appropriate for younger
-children. For this purpose the original, unstemmed words are used, but 
-with punctuation removed and all letters set to lower case.
 
 
 ## The NRC lexicon
@@ -181,7 +203,8 @@ nrc <- get_sentiments("nrc")
 nrc |> inner_join( qs_analysis, by = "word", multiple = "all",
                    relationship = "many-to-many") |>
   filter(
-         !sentiment %in% c("positive", "negative")
+         !sentiment %in% c("positive", "negative") &
+           title == "Text"
          )  -> qs_nrc
 ```
 ```{r fig.height=4}
@@ -197,17 +220,17 @@ ggplot(qs_nrc, aes(x = sentiment, color = sentiment, fill = sentiment)) +
   scale_color_brewer(palette = "Set1")
 ```
 
-```{r fig.width = 7}
-ggplot(qs_nrc, aes(x = title, color = sentiment, fill = sentiment))  +
+```{r fig.width = 7, eval=FALSE}
+ggplot(qs_nrc, aes(x = younger, color = sentiment, fill = sentiment))  +
   geom_bar() +
   coord_flip() +
-  facet_grid(rows = vars(younger),  scales = "free_y") +
+#  facet_grid(rows = vars(younger),  scales = "free_y") +
     theme_minimal() +
  theme( axis.text.y = element_text(size = 5),
         axis.ticks.y=element_blank(),
         axis.text.x = element_text(angle = 60)) +
   labs(title = "Figure 5: Distribution of NRC Sentiments",
-       subtitle = "By whether the book is recommended for younger readers") +
+       subtitle = "By whether the book is recommended for younger readers", x = "Recommended for Children?") +
   scale_fill_brewer(palette = "Set1") +
   scale_color_brewer(palette = "Set1")
   
@@ -217,8 +240,49 @@ The distribution of these terms indicates that it is particular stories that
 have many words reflecting the NRC sentiments. (X-squared = 711.75, df = 203, p-value < 2.2e-16)
 There are important differences between the two groups of stories. The stories
 appropriate for children have more labelled words overall. A Chi-squared
-test indicates that the two variables are not independent. The children's
-stories are much more likely to have the emotions of fear, joy and trust than the other stuories. (X-squared = 20.885, df = 7, p-value = 0.003944)
+test of independence leads to rejection of the null
+hypothesis that the two variables are independent. 
+The children's
+stories are much more likely to have the emotions of fear, joy and trust than the other stories. (X-squared = 20.885, df = 7, p-value = 0.003944)
+
+# Clustering stories
+
+```{r}
+if (!exists("qs_nrc" )){
+  load(here("data/qs_nrc.rda"))
+}
+
+qs_nrc$title_short <- sub("\\..*","", qs_nrc$section_title)
+
+title_translate <- qs_nrc |> 
+  group_by(section_title, title_short) |> 
+  summarize(n_tokens = n())
+table(qs_nrc$title_short, qs_nrc$sentiment) |>
+  prop.table() |>
+  as.data.frame() |> pivot_wider(values_from = Freq, names_from = Var2) -> nrcdata
+
+nrcdata <- as.data.frame(nrcdata)
+rownames(nrcdata) <- nrcdata$Var1
+nrcdata <- nrcdata[-1]
+qs_dist <- dist(nrcdata)
+pam(qs_dist, k = 2, metric = "euclidean", stand = FALSE) -> k2
+dd <- cbind(nrcdata, cluster = k2$cluster) 
+dd$title_short <- rownames(dd)
+dd <- dd |>  left_join(title_translate, by = "title_short")
+
+nrcdata <- as.data.frame(nrcdata)
+rownames(nrcdata) <- nrcdata$Var1
+nrcdata <- nrcdata[-1]
+k2$data <- nrcdata
+k2$diss <- qs_dist
+fviz_cluster(k2,
+    ##palette = c("#00AFBB", "#FC4E07"), # color palette
+    ellipse.type = "t", # Concentration ellipse
+    repel = TRUE, # Avoid label overplotting (slow)
+    ggtheme = theme_classic())
+```
+
+
 
 # Next Steps
 
