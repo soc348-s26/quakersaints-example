@@ -37,10 +37,54 @@ Use the wordStem(words, language = "english") function to create a new version o
 
 
 ```{r}
-wordStem(quakersaints_long$word) -> quakersaints_long$word_stemmed
+qs_tokens |> mutate(word_stemmed = wordStem(word)) -> qs_tokens
 
 # quakersaints_long |> mutate(word_stemmed = wordStem(word)) -> quakersaints_long
 ```
 
 Now rerun you analysis of the top words.  Do any rankings change when you 
 use the stemmed words instead of the unstemmed words? 
+
+
+```{r}
+qs_tokens |> count(word_stemmed, sort = TRUE) |>
+  filter(n > 200) |>
+  mutate(word_stemmed = reorder(word_stemmed, n)) |>
+  ggplot(aes(n, word_stemmed)) +
+  geom_col() +
+  labs(y = NULL)
+```
+
+```{r}
+qs_tokens |> count(word, sort = TRUE) |>
+  filter(n > 200) |>
+  mutate(word = reorder(word, n)) |>
+     
+  ggplot(aes(x = n, y = word)) +
+  geom_col() +
+  labs(y = NULL)
+```
+
+```{r}
+qs_tokens |> count(word_stemmed, sort = TRUE) |>
+  filter(n > 200) |>
+  mutate(word_stemmed = reorder(word_stemmed, n)) 
+```
+
+Stemming the words increases the
+ranking of some of the words and
+decreases others.
+For example, unstemmed, fox and god were the top two words, but 
+with the stemmed data fox moves to
+the second position and god moves to 
+fifth position.  The string
+"dai" is the most common word in
+the stemmed data, while "day" 
+was in the fourth position in
+the unstemmed data.
+
+Time is also common in both. Maybe
+there is something going on with
+ideas about time (time and day are both about time). We should look
+more closely at this.
+
