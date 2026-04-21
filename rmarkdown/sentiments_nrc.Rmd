@@ -71,10 +71,6 @@ nrc |> inner_join(qs_tokens, by = "word", multiple = "all",
 ```
 
 
-```{r}
-
-```
-
 Overall the words in our files are more positive than negative. 
 
 Of course there are many questions we can ask about these distributions.

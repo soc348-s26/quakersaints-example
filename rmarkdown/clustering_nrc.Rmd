@@ -1,0 +1,143 @@
+---
+title: "Data reduction of Sentiments"
+output: md_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+
+If the file doesn't exist go back and run the qs_nrc file.
+```{r}
+library(here)
+library(dplyr)
+library(tidyr)
+library(cluster)
+library(ggplot2)
+library(factoextra)
+```
+
+Let's make a shorter version of the titles.
+I realized I needed to do this after making the graphs.
+
+```{r}
+if (!exists("qs_nrc" )){
+  load(here("data/qs_nrc.rda"))
+}
+
+qs_nrc$title_short <- sub("\\..*","", qs_nrc$section_title)
+
+title_translate <- qs_nrc |> 
+  group_by(section_title, title_short) |> 
+  summarize(n_tokens = n())
+
+```
+
+Remember from the nrc sentiment analysis "the most common
+emotion is trust, followed by anticipation, joy and fear"
+
+```{r}
+
+
+prop.table(table(qs_nrc$title_short, qs_nrc$sentiment), 2) |>
+  round(2)
+table(qs_nrc$title_short, qs_nrc$sentiment) |>
+  prop.table() |>
+  as.data.frame() |> pivot_wider(values_from = Freq, names_from = Var2) -> nrcdata
+
+
+
+```
+I'm going to subset the data so it is just the 
+stories and to drop the "negative" and "positive" 
+sentiments.
+
+```{r}
+nrcdata |> filter(!Var1 %in% c("A TALK ABOUT SAINTS", 
+                               "COME-TO-GOOD",
+                               "HISTORICAL NOTES",
+                               "PREFACE") ) |>
+            select(-positive, -negative) ->
+  nrcdata
+```
+
+I am interested in the question of whether there are patterns
+of similarity between the stories.
+
+First I am going to calculate "how far apart" the stories 
+are using a distance measure (see separate file explaining this).
+For this I use the function `dist()`.  
+By reading ?dist you can see that there are 
+difference methods to calculate distance:  
+
+"euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski"
+
+The default is euclidean so I'll use that first.
+
+I don't want to use the first column for the calculation
+so to keep the labels I am going to creat row.names.
+
+```{r}
+nrcdata <- as.data.frame(nrcdata)
+rownames(nrcdata) <- nrcdata$Var1
+nrcdata <- nrcdata[-1]
+```
+
+The distance object shows how far apart the stories
+are from each other. This is a distance -- think of it
+like inches.  Higher distances means the chapters
+are farther apart. A distance of 0 means that they 
+are in the same location. 
+
+```{r}
+qs_dist <- dist(nrcdata)
+qs_dist
+
+max(qs_dist)
+min(qs_dist)
+```
+The furthest apart are XXVI and VI.  
+XXVI. RICHARD SELLAR AND THE 'MERCIFUL MAN'  
+VI. THE SHEPHERD OF PENDLE HILL
+
+The closes are XXIV and XIII  
+XIII. MAGNANIMITY
+XXIV. THE VICTORY OF AMOR STODDART
+
+When I write up the project The Shepherd of Pendle Hill is 
+one I will definitely talk about because it has come up 
+in a number of the analyses. 
+
+
+
+```{r}
+
+fviz_nbclust(nrcdata, pam, method = "silhouette")+
+  theme_classic()
+```
+
+So there are two clusters.  This is interesting because
+in some of the other analyses it looked like there 
+are stories about George Fox and everything else.
+
+```{r}
+pam(qs_dist, k = 2, metric = "euclidean", stand = FALSE) -> k2
+dd <- cbind(nrcdata, cluster = k2$cluster) 
+dd$title_short <- rownames(dd)
+dd <- dd |>  left_join(title_translate, by = "title_short")
+```
+```{r}
+k2$data <- nrcdata
+k2$diss <- qs_dist
+fviz_cluster(k2,
+    ##palette = c("#00AFBB", "#FC4E07"), # color palette
+    ellipse.type = "t", # Concentration ellipse
+    repel = TRUE, # Avoid label overplotting (slow)
+    ggtheme = theme_classic()
+)
+```
+
+```{r}
+dd |> select(cluster, section_title) |> arrange(cluster)
+```
+
