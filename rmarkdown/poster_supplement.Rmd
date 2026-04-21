@@ -1,0 +1,129 @@
+---
+title: "Poster Supplement"
+output: html_document
+
+---
+
+This file contains supplemental information for my poster.
+If I want, I can put this on a web page and add a QR code
+to my poster leading to this document.
+
+## George Fox and others
+
+George Fox was the founder of Quakerism and
+what is presumably his last name is the top word in 5 stories. Of 
+course it is possible that some instances may be a reference to the
+animal or to some other person named fox. 
+
+What if we look at how often the word fox appears in all of the
+stories.
+```{r}
+# If the file of saved data is not present
+if (!file.exists(here("data/quakersaints_trimmed.rda"))) {
+      message("quakersaints_trimmed needs to be recreated")
+# Otherwise, 
+} else {
+     # load the data set from the file.
+     load(here("data/quakersaints_trimmed.rda"))
+}
+```
+
+```{r}
+quakersaints_trimmed |>
+  mutate(text = tolower(text)) |>
+  mutate(text = str_replace_all(text,
+             c("george fox" = "george_fox",
+               "g. fox" = "george_fox", 
+               "robert fowler" = "robert_fowler",
+               "master robert fowler" = "robert_fowler",
+               "james nayler" = "james_nayler",
+               "judge fell" = "judge_fell", 
+               "john audland" = "john_audland",
+               "meeting-house" = "meeting_house",
+               "meeting house" = "meeting_house" ,
+               "steeple-house" = "steeple_house",
+               "steeplehouse" = "steeple_house",
+               "valiant sixty" = "valiant_sixty", 
+               "edward burrough" = "edward_burrough",
+               "e. burrough" = "edward_burrough",
+               "john camm" = "john_camm",
+               "sir edward" =  "sir_edward",
+               "grand vizier"  = "grand_vizier",
+               "mary fisher"  = "mary_fisher",
+               "mistress fell" = "margaret_fell",
+               "margaret fell" = "margaret_fell",
+               "margaret fox" = "margaret_fell",
+               "william dewsbury" = "william_dewsbury",
+               "james parnell"   = "james_parnell",
+               "william savery" = "william_savery",
+               "leonard fell"  = "leonard_fell",
+               "preston patrick" = "preston_patrick",
+               "swarthmoor hall" = "swarthmoor_hall",
+               "lord power"  = "lord_power",
+               "stephen grellet" = "stephen_grellet",
+               "etienne de grellet" = "stephen_grellet",
+               "tanner savery" = "william_savery",
+               "mary savery" = "mary_savery",
+               "mrs savery" = "mary_savery",
+               "george robinson" = "george_robinson",
+              "richard sellar" =  "richard_sellar",
+              "shepherd of pendle" = "shepherd_of_pendle",
+              "rough moll" = "rough_moll" #,
+              #"the man in leather breeches" = "george_fox",
+              # "the shepherd of pendle hill" = "george_fox"
+                                  )))|>
+  # remove an empty rows
+  filter(!is.na(text))  -> quakersaints_trimmed2
+
+```
+```{r}
+quakersaints_trimmed2 |> 
+  unnest_tokens(output=word, input = text, token = "words") ->
+   qs_tokens
+
+```
+```{r}
+ qs_tokens |> anti_join(stop_words) -> qs_tokens
+
+```
+```{r}
+save(qs_tokens, file = here("data/qs_tokens.rda"))
+```
+
+
+
+```{r}
+qs_tokens |> filter(text_type == "Story" & title_type =="main"
+                    ) |>
+             group_by(section_title) |>
+             summarize(uses = sum(word == "george_fox")) |>
+             kable(caption = "Presence of 'george_fox' by story")
+```
+
+
+So despite george_fox being the most common word, there are there are 5 stories
+which don't use it at all. Among those which have the word, there 
+are big differences. The story "Taming the Tiger" has the most uses,
+43.
+
+One thing that is striking to me is that "THE MAN IN LEATHER BREECHES" 
+and "THE SHEPHERD OF PENDLE HILL" don't mention Fox, because 
+both of those descriptions refer to Fox.
+
+
+## Quaker Words 
+
+Over time, working with this book, I concluded it was important
+to track "Quaker words". The solution I came up with was to 
+add a variable indicating if a token was one of these words. (I also
+considered treating them as stop words.)
+This is an example of how any text you are working with may have
+very specific issues that may need to be considered.
+
+```{r}
+quaker_words <- c("thou", "thee", "thy", "art", "hast", "thine")
+qs_tokens |> mutate(quaker_word = ifelse(word %in% quaker_words, 
+                                         "Yes", "No")) -> qs_tokens
+
+```
+

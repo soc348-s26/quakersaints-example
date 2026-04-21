@@ -38,6 +38,7 @@ Use the wordStem(words, language = "english") function to create a new version o
 
 ```{r}
 qs_tokens |> mutate(word_stemmed = wordStem(word)) -> qs_tokens
+save(qs_tokens, file = here("data/qs_tokens.rda"))
 
 # quakersaints_long |> mutate(word_stemmed = wordStem(word)) -> quakersaints_long
 ```
