@@ -1,6 +1,8 @@
 ---
 title: "Data reduction of Sentiments"
-output: html_document
+output:
+  md_document:
+    variant: markdown_github
 editor_options: 
   markdown: 
     wrap: 72
@@ -163,8 +165,8 @@ dd |> select(cluster, section_title) |>
 
 ```{r}
 dd <- dd |> left_join(quaker_counts)
-table(dd$cluster, dd$`George Fox`)
-table(dd$cluster, dd$`Quaker Words`)
+#table(dd$cluster, dd$`George Fox`)
+#table(dd$cluster, dd$`Quaker Words`)
 
 dd |> group_by(cluster) |> 
   summarize(`N of Stories` = n(),
