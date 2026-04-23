@@ -1,0 +1,71 @@
+---
+title: "An alternative approach"
+output: html_document
+---
+```{r}
+library(dplyr)
+library(stringr)
+library(here)
+library(tidytext)
+library(tidyr)
+```
+
+```{r}
+if (file.exists(here("data/quakersaints_trimmed.rda"))) {
+     load(here("data/quakersaints_trimmed.rda")) 
+} else {
+  print("quakersaints_trimmed not present.")
+  knitr::knit_exit()
+}
+```
+```{r}
+
+
+quakersaints_trimmed |> 
+  unnest_tokens(output=word, input = text, token = "words") ->
+   qs_tokens
+
+```
+
+`
+
+Another approach that focuses on highlighting differences, without
+using stop words is the calculation of the `tf_idf` for each word
+in each document. This stands for Term Frequency-Inverse-Document
+Frequency.  This is less complicated than it sounds.
+
+Step 1: What does is ask how many of the stories does the term 
+appear in.  What proportion of stories is that? 
+
+```{r}
+qs_tokens |> 
+  # get the number of times each word appears by item 
+  count(section_title, word, sort = TRUE)  -> 
+  tf
+```
+One thing that is interesting here is that because we are using the
+words present in a text, we don't actually have the words _not_
+present.  Therefore, values_fill = 0 is used to add the 0s.
+```{r}
+tf |> pivot_wider(id_cols = section_title, names_from = word,
+                  values_from = n, values_fill = 0) -> tfm
+```
+
+However, let's go back to the `tf` data 
+For each word we want to find out how many documents it is used in.
+
+```{r}
+total_documents <- unique(tf$section_title) |> length()
+
+tf |>
+  group_by(word)  |>
+ summarize(n_documents = n(), 
+         prop_documents  = n_documents/total_documents,
+         ln_prop = log(prop_documents)) ->
+  tf_weights
+
+```
+
+We use the log (natural log) here which means that if the proportion
+is 1 (that is the word is in all of the stories) we get a tf_weight of 0.
+

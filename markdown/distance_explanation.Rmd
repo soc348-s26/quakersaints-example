@@ -1,0 +1,179 @@
+
+```{r}
+library(ggplot2)
+```
+
+
+# Understanding distance
+
+Normally when people think about distance, they think of 
+something like miles or kilometers. 
+To measure distance in physical travel we can ask how many
+miles is it between Point A and Point B.
+
+But right away there is a question: do we want to know 
+how far apart they are in a straight line? Or how many 
+miles we would have to drive in a car to get there? 
+What about if we walked? Would that be a different number
+of miles?  What about if we tried to take the train and/or bus?
+How many miles is that? And what would happen if we 
+measured distance in time rather than miles? 
+
+In data science we have the same kind of issues.  We can 
+want to know how far apart two different observations (rows) are
+from each other. This is a surprisingly useful question in 
+all kinds of topics and methods.  There are also many different
+ways to measure distance. 
+
+Let's look at euclidian distance in R. 
+
+For our first example let's have one variable with two
+observations.
+
+```{r}
+example1 <- data.frame(var1 = c(5, 10))
+dist(example1)
+```
+
+As you can see, the distance between the two observations
+is 5. To get from 5 to 10 you need to travel 5 units.
+
+What if we have 3 observations? 
+```{r}
+example2 <- data.frame(var1 = c(5, 10,  7))
+dist(example2)
+```
+Here we can see that 3 observations means there are 3 
+distances:
+Observation 1 to Observation 2 is still 5.
+Observation 1 to Observation 3 is 2.
+Observation 3 to observation 2 is 3.
+
+Make sure you see where those numbers come from. 
+
+Some important things to notice about Euclidean distances are. 
+
+1. The distance between any observation and itself is 0 so 
+the display of the distances does not include this information.
+
+2. The distance from observation 1 to observation 2 is the same 
+as the distance from observation 2 to observation 1 (in this version of reality). So R only shows each of these one time.  
+
+3. Distances are positive. It's "how many miles apart" 
+without information on direction of travel.
+
+Now let's get a little more complicated and have two
+variables for each row.
+
+```{r}
+example2 <- data.frame(var1 = c(5, 10), var2 = c(1,6))
+dist(example2)
+```
+
+
+There is still just one distance between observation 1 and
+observation 2. However the Euclidian distance is now given as
+(rounded) 7.07.
+
+How did R get this? 
+
+It may help to visualize the data. 
+
+```{r warning=FALSE}
+example2 |> ggplot(aes(x = var1, y = var2)) +
+  geom_point() +
+  geom_line() +
+  geom_segment(aes(x = 5, y = 1, xend = 10), color = "darkgray") +
+geom_segment(aes(x = 10, y = 1, yend = 6), color = "darkgray")
+```
+
+You could make a right triangle (one angle is 90 degrees) by 
+drawing a horizontal line starting from the point at (5, 1) and going to 
+(10, 1). That line would be 5 units long (try it and see).
+
+Then make a straight line that goes from the point
+at (10, 6) to (10, 1). That would be 6-1 or 5 also. 
+
+We can measure the overall distance by using the Pythagerean Theorem 
+which applies to right triangles. The _a_ will be the distance
+of the horizontal line and the _b_ will be the distance of the
+vertical line. 
+
+$$a^2 + b^2 = c^2$$
+
+So to calculate the distance this we would say 
+
+$$5^2 + 5^2 = distance^2 $$
+
+and then take the square root of the distance squared.
+
+```{r}
+(5^2 + 5^2) |> sqrt()
+```
+
+And there we can see that it matches what R calculated.
+
+R can also use other methods. For example, New Yorkers
+know that you can measure distances in terms of blocks you
+need to walk. So from Fifth Avenue and 34th St to 
+Park Avenue and 33rd Street, you have to walk 2 blocks,
+one down Fifth Avenue to 33rd Street followed by
+going on 33rd Street from Fifth Avenue to Park.
+
+```{r}
+dist(example2, method = "manhattan")
+```
+
+Confirm for yourself that the points are 10 blocks apart.
+You can use the graph to help.
+
+There are also other options.
+
+What about bigger data sets, with more than 2 columns and 
+many rows? R can handle that too! 
+
+A related concept is _similarity_.  In similarity,
+the 
+```{r}
+library(proxy)
+simil(example2)
+```
+With this simple data there is no similarity between
+the rows. 
+
+Let's try something more complicated.
+
+```{r}
+
+example3 <- data.frame(var1 = c(5, 10,  7),
+                       var2 = c(1, 6, 7), 
+                       var3 = c(5, 10, 10))
+dist(example3)
+simil(example3, by_rows = TRUE)
+
+
+```
+
+Here there are three rows and three columns.  
+The distance matrix is giving us a measure of the distances
+between the three points (they are the x, y and z values so 
+it's distance in 3-dimensional space).  Bigger numbers
+mean further distances.
+
+With similarity bigger numbers means more similar. So
+the most similar rows are the second and third. This 
+makes sense because those two rows have a common value (10)
+and two of the values (6 and 7 in the second column) are
+close to each other.
+
+We can also compute column similarity. 
+
+```{r}
+simil(example3, by_rows = FALSE)
+```
+
+When using clustering methods you are using specific kinds
+of distance and similarity measures. The clustering methods
+generally work by putting similar observations into 
+clusters using some criteria (which can vary) to decide
+what the best solution is.
