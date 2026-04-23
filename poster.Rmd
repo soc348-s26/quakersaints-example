@@ -160,26 +160,42 @@ Although Quaker words is concentrated in a few stories. In
 particular "Pale Windflowers" uses 118 of them. The story
 is about the important early Quaker leader William Dewsbury 
 and his grand daughter. Most 
-of the Quaker words are part of dialoues between them or with
+of the Quaker words are part of dialogues between them or with
 her mother or aunt. 
+
+The limitation that using "george_fox" rather
+that "fox" means that the presence of mentions of Fox may be
+undercounted
 
 ```{r}
 qs_tokens |>  
   filter(text_type == "Story" & title_type == "main") |>
   group_by(section_title) |>
   summarize(`George Fox` = sum(word == "george_fox"), 
-            `Quaker Words` = sum(quaker_word == "Yes")) ->
+            `Quaker Words` = sum(quaker_word == "Yes"),
+            `Younger Readers` = unique(younger)) ->
   quaker_counts
 #quaker_counts |>
 #        kable(caption = "Presence of 'George Fox' and Quaker Words by story")
 ```
 
+
+
+
 ```{r}
-ggplot(quaker_counts, aes(x = `George Fox`, y = `Quaker Words`))  +
+quaker_counts |> filter(section_title != "XXI. PALE WIND FLOWERS: OR THE LITTLE PRISON MAID") |>
+ggplot( aes(x = `George Fox`, y = `Quaker Words`,
+        color = `Younger Readers`))  +
   geom_point() +
-  labs(title = "Counts of George Fox and Quaker Words")
+  labs(title = "Counts of George Fox and Quaker Words",
+       subtitle = "`Pale Windflowers` excluded")
 ```
 
+Overall, there is a general negative relationship between
+the frequency of george_fox and the use of Quaker words. 
+The stories for younger readers often have many uses of 
+either, but it seems to be an alternative. That is, there 
+are not any that have many uses of both terms.
 
 # Sentiment Analysis
 
@@ -245,7 +261,7 @@ hypothesis that the two variables are independent.
 The children's
 stories are much more likely to have the emotions of fear, joy and trust than the other stories. (X-squared = 20.885, df = 7, p-value = 0.003944)
 
-# Clustering stories
+# Clustering the stories
 
 ```{r}
 if (!exists("qs_nrc" )){
@@ -281,6 +297,47 @@ fviz_cluster(k2,
     repel = TRUE, # Avoid label overplotting (slow)
     ggtheme = theme_classic())
 ```
+
+Overall, however, the differences between the clusters
+are not primarily about the sentiments expressed, but are 
+in the extent to which any sentiment is expressed. Cluster 2
+expresses _more_ sentiments than Cluster 1, regardless of 
+what the sentiment is.
+
+```{r fig.width = 7}
+dd <- dd |> left_join(quaker_counts)
+dd |> pivot_longer(cols = c(anticipation:trust),
+                   names_to = "sentiment",
+                   values_to = "value") |>
+ggplot( aes(x = cluster, y= value, color = sentiment, fill = sentiment))  +
+  geom_col() +
+  coord_flip() +
+#  facet_grid(rows = vars(younger),  scales = "free_y") +
+    theme_minimal() +
+ theme( axis.text.y = element_text(size = 5),
+        axis.ticks.y=element_blank(),
+        axis.text.x = element_text(angle = 60)) +
+  labs(title = "Figure 5: Distribution of NRC Sentiments by cluster",
+        x = "Cluster") +
+  scale_fill_brewer(palette = "Set1") +
+  scale_color_brewer(palette = "Set1")
+  
+```
+
+
+```{r}
+dd |> group_by(cluster) |> 
+  summarize(`N of Stories` = n(),
+            `Quaker Words` = sum(`Quaker Words` > 0),
+            `George Fox` = sum(`George Fox` > 0),
+            `For Younger` = sum(`Younger Readers`)) |>
+  kable(caption = "Characteristics of Stories in Clusters")
+```
+
+The stories in cluster 2 have a much higher proportion of 
+use of george_fox and Quaker words and are more likely to
+be for younger readers.
+
 
 
 
