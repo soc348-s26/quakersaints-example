@@ -1,6 +1,6 @@
 ---
 title: "Data reduction of Sentiments"
-output: md_document
+output: html_document
 editor_options: 
   markdown: 
     wrap: 72
@@ -8,13 +8,14 @@ editor_options:
 
 
 If the file doesn't exist go back and run the qs_nrc file.
-```{r}
+```{r message=FALSE}
 library(here)
 library(dplyr)
 library(tidyr)
 library(cluster)
 library(ggplot2)
 library(factoextra)
+library(knitr)
 ```
 
 Let's make a shorter version of the titles.
@@ -23,6 +24,9 @@ I realized I needed to do this after making the graphs.
 ```{r}
 if (!exists("qs_nrc" )){
   load(here("data/qs_nrc.rda"))
+}
+if (!exists("qs_tokens" )){
+  load(here("data/qs_tokens.rda"))
 }
 
 qs_nrc$title_short <- sub("\\..*","", qs_nrc$section_title)
@@ -40,7 +44,7 @@ emotion is trust, followed by anticipation, joy and fear"
 
 
 prop.table(table(qs_nrc$title_short, qs_nrc$sentiment), 2) |>
-  round(2)
+  round(2) |> kable(caption = "Sentiment by title")
 table(qs_nrc$title_short, qs_nrc$sentiment) |>
   prop.table() |>
   as.data.frame() |> pivot_wider(values_from = Freq, names_from = Var2) -> nrcdata
@@ -91,7 +95,7 @@ are in the same location.
 
 ```{r}
 qs_dist <- dist(nrcdata)
-qs_dist
+#qs_dist 
 
 max(qs_dist)
 min(qs_dist)
@@ -125,6 +129,13 @@ pam(qs_dist, k = 2, metric = "euclidean", stand = FALSE) -> k2
 dd <- cbind(nrcdata, cluster = k2$cluster) 
 dd$title_short <- rownames(dd)
 dd <- dd |>  left_join(title_translate, by = "title_short")
+qs_tokens |>  
+  filter(text_type == "Story" & title_type == "main") |>
+  group_by(section_title) |>
+  summarize(`George Fox` = sum(word == "george_fox"), 
+            `Quaker Words` = sum(quaker_word == "Yes"),
+            `Younger Readers` = unique(younger)) ->
+  quaker_counts
 ```
 ```{r}
 k2$data <- nrcdata
@@ -137,7 +148,33 @@ fviz_cluster(k2,
 )
 ```
 
+Story 1 is " 'STIFF AS A TREE, PURE AS A BELL'"
+Story 9 is "Strike again"
+
+Stand somewhat outside the ellipses. Both are retellings
+(sometimes direct quotations from) of passages in 
+the Journal of George Fox.
+
 ```{r}
-dd |> select(cluster, section_title) |> arrange(cluster)
+dd |> select(cluster, section_title) |> 
+  arrange(cluster, section_title) |>
+  kable(caption = "Cluster assignments for stories")
 ```
+
+```{r}
+dd <- dd |> left_join(quaker_counts)
+table(dd$cluster, dd$`George Fox`)
+table(dd$cluster, dd$`Quaker Words`)
+
+dd |> group_by(cluster) |> 
+  summarize(`N of Stories` = n(),
+            `Quaker Words` = sum(`Quaker Words` > 0),
+            `George Fox` = sum(`George Fox` > 0),
+            `For Younger` = sum(`Younger Readers`)) |>
+  kable(caption = "Characteristics of Stories")
+```
+
+The Stories in Cluster 1 are less likely to include "george_fox" or use Quaker words, but even more dramatic
+is that they are less than half as likely to be 
+in the appropriate for younger children category.
 
