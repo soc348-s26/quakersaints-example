@@ -27,7 +27,7 @@ permissions:
       - name: Setup Pandoc
         uses: r-lib/actions/setup-pandoc@v2
 
-- name: Install R dependencies
+-       name: Install R dependencies
 run: |
   install.packages(c('rmarkdown', 'tidytext', 'cluster',
   'factoextrar', 'dplyr', 'tidyr', 'ggplot2',
