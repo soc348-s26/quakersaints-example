@@ -32,10 +32,14 @@ run: |
   install.packages(c('rmarkdown', 'tidytext', 'cluster',
   'factoextrar', 'dplyr', 'tidyr', 'ggplot2',
   'stringr', 'here', 'RColorBrewer', 'wordcloud',
-  'kableExtra', 'ggrepel', 'pagedown', 'posterdown'),
+  'kableExtra', 'ggrepel', 'pagedown'),
                    repos = 'https://cloud.r-project.org')
 shell: Rscript {0}
-
+- name: Install GitHub Package
+  run: |
+    install.packages("remotes")
+    remotes::install_github("brentthorne/posterdown")
+  shell: Rscript {0}
 - name: Render files
 run: |
 
@@ -43,6 +47,6 @@ run: |
   rmarkdown::render('sentiments_nrc.Rmd')
   rmarkdown::render('sentiments_afinn.Rmd')
     rmarkdown::render('stemming.Rmd')
-    rmarkdown::render('cluster.Rmd')
+    rmarkdown::render('clustering_nrc.Rmd')
   rmarkdown::render('poster.Rmd')
 shell: Rscript {0}
