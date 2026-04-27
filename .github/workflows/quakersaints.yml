@@ -12,8 +12,6 @@ workflow_dispatch:
   jobs:
   build-markdown:
   runs-on: ubuntu-latest
-permissions:
-  contents: write  # Required for pushing to gh-pages branch
 
     steps:
       - name: Checkout repository
@@ -28,13 +26,13 @@ permissions:
         uses: r-lib/actions/setup-pandoc@v2
 
 -       name: Install R dependencies
-run: |
+        run: |
   install.packages(c('rmarkdown', 'tidytext', 'cluster',
   'factoextrar', 'dplyr', 'tidyr', 'ggplot2',
   'stringr', 'here', 'RColorBrewer', 'wordcloud',
   'kableExtra', 'ggrepel', 'pagedown'),
                    repos = 'https://cloud.r-project.org')
-shell: Rscript {0}
+  shell: Rscript {0}
 - name: Install GitHub Package
   run: |
     install.packages("remotes")
