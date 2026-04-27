@@ -17,7 +17,7 @@ permissions:
 
 steps:
   - name: Checkout repository
-uses: actions/checkout@v4
+    uses: actions/checkout@v4
 
 - name: Setup R
 uses: r-lib/actions/setup-r@v2
@@ -42,11 +42,10 @@ shell: Rscript {0}
   shell: Rscript {0}
 - name: Render files
 run: |
-
-  rmarkdown::render('sentiments_bing.Rmd')
-  rmarkdown::render('sentiments_nrc.Rmd')
-  rmarkdown::render('sentiments_afinn.Rmd')
-    rmarkdown::render('stemming.Rmd')
-    rmarkdown::render('clustering_nrc.Rmd')
-  rmarkdown::render('poster.Rmd')
+  rmarkdown::render('sentiments_bing.Rmd, output_format = "md_document"')
+  rmarkdown::render('sentiments_nrc.Rmd', output_format = "md_document")
+  rmarkdown::render('sentiments_afinn.Rmd, output_format = "md_document"')
+  rmarkdown::render('stemming.Rmd', output_format = "md_document")
+  rmarkdown::render('clustering_nrc.Rmd', output_format = "md_document")
+  rmarkdown::render('poster.Rmd', output_format = "md_document")
 shell: Rscript {0}

@@ -45,6 +45,8 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE,
 # to the YAML and then knit from the command line.
 # To install posterdown, go to the console and use
 # remotes::install_github("brentthorne/posterdown").
+# Also on github actions  to test that is is rendering I am
+# knitting to md (plain markdown)
 
 library(dplyr)
 library(tidyr)
@@ -57,7 +59,7 @@ library("stringr")
 #library("quanteda")
 library(knitr)
 library(bookdown)
-library(rsconnect)
+#library(rsconnect)
 library(here)
 library(RColorBrewer)
 library(wordcloud)
