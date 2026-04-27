@@ -1,0 +1,82 @@
+---
+title: "Data reduction of Sentiments"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+
+
+
+```{r}
+load(here("data/qs_nrc.rda"))
+```
+```{r}
+library(tidytext)
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+library(scales)
+library(ggforce)
+library(forcats)
+library(here)
+library(SnowballC)
+library(cluster)
+library(factoextra)
+library(quanteda)
+library(stm)
+library(topicmodels)
+```
+
+
+
+```{r}
+qs_nrc |> filter (!sentiment %in% c("positive", "negative") ) |>
+     filter(text_type == "Story" & title_type == "main") |>
+  group_by(section_title, sentiment) |> 
+  summarize(n = n()) |>
+  ungroup() |>
+  group_by(section_title) |>
+    pivot_wider(id_cols = section_title, values_fill = 0,
+                values_from = n, names_from = sentiment) |>
+     ungroup() |> as.data.frame() -> 
+     nrc_chapter
+
+ row.names(nrc_chapter) <- nrc_chapter$section_title
+ 
+ nrc_chapter |> 
+      select(-section_title) ->
+      nrc_chapter
+```
+Now let's work on simplifying
+
+```{r}
+nrc_chapter |> dist() -> nrcdist
+
+```
+
+```{r}
+fviz_nbclust(nrc_chapter, pam, method = "silhouette")+
+  theme_classic()
+```
+```{r}
+pam(nrcdist, k = 2, metric = "euclidean", stand = FALSE) -> k2
+
+dd <- cbind(nrc_chapter, cluster = k2$cluster) |> arrange(cluster)
+dd
+```
+
+```{r}
+k2$data <- nrc_chapter
+k2$diss <- nrcdist
+fviz_cluster(k2,
+    ##palette = c("#00AFBB", "#FC4E07"), # color palette
+    ellipse.type = "t", # Concentration ellipse
+    repel = TRUE, # Avoid label overplotting (slow)
+    ggtheme = theme_classic()
+)
+```
+This is a mess, let's just use the chapter numbers.
+

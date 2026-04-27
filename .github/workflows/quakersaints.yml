@@ -1,0 +1,48 @@
+name: Build Quaker Saints
+
+on:
+  push:
+  branches:
+  - main
+pull_request:
+  branches:
+  - main
+workflow_dispatch:
+
+  jobs:
+  build-markdown:
+  runs-on: ubuntu-latest
+permissions:
+  contents: write  # Required for pushing to gh-pages branch
+
+steps:
+  - name: Checkout repository
+uses: actions/checkout@v4
+
+- name: Setup R
+uses: r-lib/actions/setup-r@v2
+with:
+  r-version: 'release'
+
+- name: Setup Pandoc
+uses: r-lib/actions/setup-pandoc@v2
+
+- name: Install R dependencies
+run: |
+  install.packages(c('rmarkdown', 'tidytext', 'cluster',
+  'factoextrar', 'dplyr', 'tidyr', 'ggplot2',
+  'stringr', 'here', 'RColorBrewer', 'wordcloud',
+  'kableExtra', 'ggrepel', 'pagedown', 'posterdown'),
+                   repos = 'https://cloud.r-project.org')
+shell: Rscript {0}
+
+- name: Render files
+run: |
+
+  rmarkdown::render('sentiments_bing.Rmd')
+  rmarkdown::render('sentiments_nrc.Rmd')
+  rmarkdown::render('sentiments_afinn.Rmd')
+    rmarkdown::render('stemming.Rmd')
+    rmarkdown::render('cluster.Rmd')
+  rmarkdown::render('poster.Rmd')
+shell: Rscript {0}

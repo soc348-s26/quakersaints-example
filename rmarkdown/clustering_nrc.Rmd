@@ -47,9 +47,13 @@ emotion is trust, followed by anticipation, joy and fear"
 
 prop.table(table(qs_nrc$title_short, qs_nrc$sentiment), 2) |>
   round(2) |> kable(caption = "Sentiment by title")
+
+
 table(qs_nrc$title_short, qs_nrc$sentiment) |>
   prop.table() |>
-  as.data.frame() |> pivot_wider(values_from = Freq, names_from = Var2) -> nrcdata
+  as.data.frame() |> 
+  pivot_wider(values_from = Freq, names_from = Var2) -> 
+  nrcdata
 
 
 
@@ -97,7 +101,7 @@ are in the same location.
 
 ```{r}
 qs_dist <- dist(nrcdata)
-#qs_dist 
+qs_dist 
 
 max(qs_dist)
 min(qs_dist)
@@ -128,9 +132,12 @@ are stories about George Fox and everything else.
 
 ```{r}
 pam(qs_dist, k = 2, metric = "euclidean", stand = FALSE) -> k2
+
 dd <- cbind(nrcdata, cluster = k2$cluster) 
 dd$title_short <- rownames(dd)
 dd <- dd |>  left_join(title_translate, by = "title_short")
+
+
 qs_tokens |>  
   filter(text_type == "Story" & title_type == "main") |>
   group_by(section_title) |>

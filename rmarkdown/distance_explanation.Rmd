@@ -41,7 +41,7 @@ is 5. To get from 5 to 10 you need to travel 5 units.
 What if we have 3 observations? 
 ```{r}
 example2 <- data.frame(var1 = c(5, 10,  7))
-dist(example2)
+dist(example2, diag =TRUE, upper=TRUE)
 ```
 Here we can see that 3 observations means there are 3 
 distances:
@@ -83,8 +83,8 @@ It may help to visualize the data.
 example2 |> ggplot(aes(x = var1, y = var2)) +
   geom_point() +
   geom_line() +
-  geom_segment(aes(x = 5, y = 1, xend = 10), color = "darkgray") +
-geom_segment(aes(x = 10, y = 1, yend = 6), color = "darkgray")
+ geom_segment(aes(x = 5, y = 1, xend = 10), color = "darkgray") +
+ geom_segment(aes(x = 10, y = 1, yend = 6), color = "darkgray")
 ```
 
 You could make a right triangle (one angle is 90 degrees) by 
