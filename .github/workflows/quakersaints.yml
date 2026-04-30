@@ -10,11 +10,10 @@ pull_request:
 workflow_dispatch:
 
 jobs:
-  build-postcards:
+  render-quakers:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Required for pushing to gh-pages branch
-
+      contents: write  
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
