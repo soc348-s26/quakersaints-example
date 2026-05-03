@@ -11,6 +11,11 @@ library(knitr)
 library(ggplot2)
 library(tm)
 library(topicmodels)
+# needed if you are not on the server, but just once
+#devtools::install_github("nikita-moor/ldatuning")
+library(ldatuning)
+library(stm)
+library(quanteda)
 ```
 
 To do this analysis in this file, you will need to copy your saved 
@@ -182,6 +187,15 @@ qs_topics_4 <- tidy(qs_lda_4, matrix = "beta")
 head(qs_topics_4)
 ```
 
+```{r}
+qs_lda_8 <-
+  LDA( quakersaints_dtm, k = 8, control = list(seed= seed))
+```
+```{r}
+qs_topics_8 <- tidy(qs_lda_8, matrix = "beta")
+head(qs_topics_8)
+```
+
 Notice that each row is a topic-term. That is, there is a row for each
 combination of topic and word.  Since we set k =2 there are two rows per
 word. with a higher k we will see k rows per term.
@@ -206,7 +220,7 @@ That is the 10 words with the highest probabilities.
 qs_top_terms_2 <- qs_topics_2 |>
   group_by(topic) |>
   slice_max(beta, n = 10) |>
-  ungroup() %>%
+  ungroup() |>
   arrange(topic, -beta)
 
 qs_top_terms_2 |>
@@ -221,7 +235,7 @@ qs_top_terms_2 |>
 qs_top_terms_3 <- qs_topics_3 |>
   group_by(topic) |>
   slice_max(beta, n = 10) |>
-  ungroup() %>%
+  ungroup() |>
   arrange(topic, -beta)
 
 qs_top_terms_3 |>
@@ -239,7 +253,7 @@ Notice that the same words can be in multiple topics (george, god, day).
 qs_top_terms_4 <- qs_topics_4 |>
   group_by(topic) |>
   slice_max(beta, n = 10) |>
-  ungroup() %>%
+  ungroup() |>
   arrange(topic, -beta)
 
 qs_top_terms_4 |>
@@ -302,19 +316,35 @@ gamma.
 
 ```{r}
 qs_documents_2 <- tidy(qs_lda_2, matrix = "gamma")
-qs_documents_2
+qs_documents_2 |> kable()
 ```
 
 
 ```{r}
-qs_documents_3 <- tidy(qs_lda_3, matrix = "gamma")
-qs_documents_3
+qs_topics_3_g <- tidy(qs_lda_3, matrix = "gamma")
+qs_topics_3_g |> group_by(document) |>
+slice_max(gamma) |> arrange(topic) |>
+kable()
 ```
 
 ```{r}
-qs_documents_4 <- tidy(qs_lda_4, matrix = "gamma")
-qs_documents_4
+qs_topics_4_g <- tidy(qs_lda_4, matrix = "gamma")
+qs_topics_4_g |> group_by(document) |>
+slice_max(gamma) |> arrange(topic) |>
+kable()
 ```
+
+```{r}
+qs_topics_8_g <- tidy(qs_lda_8, matrix = "gamma")
+
+qs_topics_8_g |> group_by(document) |>
+slice_max(gamma) |> arrange(topic) |>
+kable()
+
+qs_topics_8_g |> group_by(document) |>
+slice_max(gamma) |> arrange(topic) -> qs_t_8_g_max
+```
+
 
 ```{r}
 top_terms_3 <- qs_topics_3 |>
@@ -325,7 +355,7 @@ top_terms_3 <- qs_topics_3 |>
 
 top_terms_3
 
-top_terms_3 %>%
+top_terms_3 |>
   mutate(term = reorder_within(term, beta, topic)) |>
   ggplot(aes(beta, term, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
@@ -333,6 +363,15 @@ top_terms_3 %>%
   scale_y_reordered()
 
 ```
+
+```{r}
+
+qs_lda_8 <-
+  LDA( quakersaints_dtm, k = 8, control = list(seed = 1234))
+qs_topics_8 <- tidy(qs_lda_8, matrix = "beta")
+
+```
+
 We can see that some words differentiate the topics and others do not.
 
 
@@ -341,39 +380,167 @@ values of k, don't be afraid to choose 10 or maybe even more. )
 
 Write up a paragraph explaining what you learned about your documents.
 
+_I am using 8 for reasons that will become clear later._
+
 
 ```{r}
-
-qs_lda_10 <-
-  LDA( quakersaints_dtm, k = 10, control = list(seed = 1234))
-qs_topics_10 <- tidy(qs_lda_10, matrix = "beta")
-head(qs_topics_10,15)
-```
-
-```{r}
-qs_top_terms_10 <- qs_topics_10 |>
+qs_top_terms_8 <- qs_topics_8 |>
   group_by(topic) |>
   slice_max(beta, n = 10) |>
-  ungroup() %>%
+  ungroup() |>
   arrange(topic, -beta)
 
-qs_top_terms_10 |>
+qs_top_terms_8 |>
   mutate(term = reorder_within(term, beta, topic)) |>
   ggplot(aes(beta, term, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ topic, scales = "free") +
   scale_y_reordered()
 ```
+
+## Determining the number of topics
+
+So far we have been mainly been assessing the number of topics
+informally (known as eye-balling).  The one exception
+might be that if we compared the gamma values for the 
+different number of themes we would see that the 8 them
+solution has very high probabilities that associate one 
+theme with each story.  But we only tried
+a few possible values, so that is not really
+valid as an approach.
+
 Is there a way to figure out the best number 
 of topics?  That is, that fit the data the best? 
 
-There is no one clear solution for this. 
+There is no one solution for this. Indeed, there are 
+many different approachs.
 
-One common way
+In the r community, different packages implement 
+these approaches, depending on which ones the 
+package author is interested in. 
+
+Here is one approach using the stm package (stm is short 
+for  structural topic modeling).
+
+The packages we will reference are `stm` and `quanteda`.
+
+Each package organizes the data in different ways. This
+is why the tidytext package has its `cast` functions, but
+there are also others. 
 
 ```{r}
-library(stm)
-ldatuning.metrics <- FindTopicsNumber(quakersaints_dtm, topics = seq(from = 2, to = 15, by = 1), metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"), method = "Gibbs", control = list(seed = 77), mc.cores = 2L, verbose = TRUE
+# Tidy our dtm
+quakersaints_dtm_tidy <- tidy(quakersaints_dtm)
+# Cast the tidy dtm to a Quanteda dfm.
+qs_dfm <- cast_dfm(quakersaints_dtm_tidy, document= document, term = term, value = count )
+# Use the Quanteda convert function to turn it into
+# an object that can be used by stm!  
+dfm_stm <- convert(qs_dfm, to = "stm")
+
+```
+
+Now we can use the `searchK` function from `stm` to 
+compare many different values of K. 
+This can take a while, depending n the size of the data.
+
+```{r}
+K <- c(3:20)
+fit <- searchK(dfm_stm$documents, dfm_stm$vocab, K = K, verbose = FALSE)
+
+```
+You can use View(fit) to look at the values, but you
+can also visualize them.  
+You can read a bit about these different measures
+here https://search.r-project.org/CRAN/refmans/stm/html/searchK.html
+
+
+```{r}
+
+plot <- data.frame("K" = K, 
+                   "Coherence" = unlist(fit$results$semcoh),
+                   "Exclusivity" = unlist(fit$results$exclus),
+                   "Heldout" = unlist(fit$results$heldout),
+                   "Residuals" = unlist(fit$results$residual),
+                   "Lower bound" = unlist(fit$results$lbound)
+                   )
+
+E_median = median(plot$Exclusivity)
+C_median = median(plot$Coherence)
+```
+
+
+```{r}
+
+plot_long <- tidyr::pivot_longer(plot, cols =  Coherence:Lower.bound, names_to = "measure")
+
+```
+
+You can see from the probabilities of .99 that, using 
+gamma, each
+of the stories is strongly associated with
+one of the eight topics.  
+
+```{r}
+ggplot(plot_long, aes(K, value, color = measure)) +
+  geom_line(size = .5, show.legend = FALSE) +
+  facet_wrap(~measure,scales = "free_y") +
+  scale_x_continuous(breaks=c(5, 10, 15, 20, 25)) +
+  labs(x = "Number of topics K",
+       title = "Statistical fit of models with different K")
+```
+
+Another way is to use the metrics available 
+from the `ldatuning` package.
+
+```{r}
+
+
+results <- FindTopicsNumber(quakersaints_dtm, topics = seq(from = 2, to = 15, by = 1), metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"), method = "Gibbs", control = list(seed = 77), mc.cores = 2L, verbose = TRUE
 )
 ```
+
+```{r}
+FindTopicsNumber_plot(results)
+```
+
+Looking over these results along with the 
+gamma results, I chose to focus in depth
+on the 8 topic soluation. 
+
+```{r}
+load(here("data/story_level_data.rda"))
+
+
+# Join the information on the best topic for each chapter
+story_level_data|>
+  left_join(qs_t_8_g_max, join_by("section_title" == "document" )) |>
+# makes some simpler variables
+mutate(mention_fox = ifelse(`George Fox` > 0, "Yes", "No"), 
+       any_quaker_words = ifelse(`Quaker Words` > 0,
+                                 "Yes", "No")) -> 
+  story_level_data
+
+table(story_level_data$topic, story_level_data$any_quaker_words) |>
+  kable(caption = "Uses Quaker words")
+
+table(story_level_data$topic,
+      story_level_data$mention_fox) |>
+  kable(caption = "Mentions George Fox full name")
+
+table(story_level_data$topic, 
+      story_level_data$`Younger Readers`) |>
+  kable(caption = "Younger Readers")
+
+```
+
+There are some interesting patterns here where the 0s
+in the tables. I'm gong to add my thoughts on that to my
+poster.
+
+Some final notes.
+
+There is nothing magic about the numbers given to a topic.
+The goal is to think about the content.
+If you run the model multiple times it may switch the
+numbers assign. That is fine. 
 
