@@ -1,6 +1,6 @@
 ---
 title: "Topic Models"
-output: html_document
+output: github_document
 ---
 ```{r}
 library(here)
@@ -97,7 +97,13 @@ There are a few different packages that do this analysis. We are going to
 using the `tm` packages.
 
 ```{r}
-load(here("data/qs_tokens.rda"))
+
+if (file.exists(here("data/qs_tokens.rda"))) {
+     load(here("data/qs_tokens.rda"))
+} else {
+  message("qs_tokens file does not exist")
+}
+}
 
 qs_tokens |> 
   filter(text_type == "Story", 
@@ -105,9 +111,9 @@ qs_tokens |>
          title_type == "main") ->
   qs_tokens_stories
 
-qs_tokens_stories |> group_by(section_title, word) |> 
+qs_tokens_stories |> group_by(section_title, word_stemmed) |> 
   summarize(n = n()) |>
-cast_dtm( term = word, document=section_title, n) -> quakersaints_dtm
+cast_dtm( term = word_stemmed, document=section_title, n) -> quakersaints_dtm
 ```
 
 Now I have a "large DocumentTermMatrix" in my environment.
@@ -147,6 +153,7 @@ seed
 
 
 ```{r}
+
 qs_lda_2 <-
   LDA( quakersaints_dtm, k = 2, control = list(seed= seed))
 qs_lda_2 
@@ -444,8 +451,14 @@ compare many different values of K.
 This can take a while, depending n the size of the data.
 
 ```{r}
-K <- c(3:20)
-fit <- searchK(dfm_stm$documents, dfm_stm$vocab, K = K, verbose = FALSE)
+
+if (!file.exists(here("data/fit.rda"))) {
+  K <- c(3:20)
+    fit <- searchK(dfm_stm$documents, dfm_stm$vocab, 
+                   K = K, verbose = FALSE)
+} else {
+  load(here("data/fit.rda"))
+}
 
 ```
 You can use View(fit) to look at the values, but you
@@ -543,4 +556,12 @@ There is nothing magic about the numbers given to a topic.
 The goal is to think about the content.
 If you run the model multiple times it may switch the
 numbers assign. That is fine. 
+
+```{r}
+save(story_level_data, file = here("data/story_level_data.rda"))
+```
+```{r}
+table(story_level_data$`Younger Readers`, story_level_data$any_quaker_words
+      )
+```
 
