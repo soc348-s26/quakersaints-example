@@ -160,7 +160,7 @@ fviz_cluster(k2,
 Story 1 is " 'STIFF AS A TREE, PURE AS A BELL'"
 Story 9 is "Strike again"
 
-Stand somewhat outside the ellipses. Both are retellings
+The stand somewhat outside the ellipses. Both are retellings
 (sometimes direct quotations from) of passages in 
 the Journal of George Fox.
 
@@ -172,8 +172,6 @@ dd |> select(cluster, section_title) |>
 
 ```{r}
 dd <- dd |> left_join(quaker_counts)
-#table(dd$cluster, dd$`George Fox`)
-#table(dd$cluster, dd$`Quaker Words`)
 
 dd |> group_by(cluster) |> 
   summarize(`N of Stories` = n(),
@@ -186,4 +184,19 @@ dd |> group_by(cluster) |>
 The Stories in Cluster 1 are less likely to include "george_fox" or use Quaker words, but even more dramatic
 is that they are less than half as likely to be 
 in the appropriate for younger children category.
+
+```{r}
+if (!file.exists(here("data/story_level_data.rda"))){
+  #This will save the data if it doesn't exist already
+  # I'm changing the name to be a big cautious 
+  story_level_data <- dd
+  save(story_level_data, file = "data/story_level_data.rda")
+} else {
+  # if it does exist, let's add the cluster information
+  load("data/story_level_data.rda")
+  story_level_data$cluster <- dd$cluster
+}
+
+
+```
 

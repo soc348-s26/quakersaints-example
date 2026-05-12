@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!--
+Font-awesome icons ie github or twitter
+-->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/brands.css" integrity="sha384-n9+6/aSqa9lBidZMRCQHTHKJscPq6NW4pCQBiMmHdUCvPN8ZOg2zJJTkC7WIezWv" crossorigin="anonymous">
+
+<!--
+Google fonts api stuff
+-->
+
+
+
+<title>Quaker Stories and the Use of Quake Language</title>
+
+
+
+
+
+
+<style>
+@page {
+size: 45in 38in;
+margin: 0;
+padding: 0;
+}
+body {
+margin: 0;
+font-size: 45px;
+width: 45in;
+height: 38in;
+padding: 0;
+text-align: justify;
+font-family: Palatino;
+}
+.poster_wrap {
+width: 45in;
+height: 38in;
+padding: 0cm;
+}
+.title_container {
+width: 100%;
+height: 15%;
+overflow: hidden;
+background-color: #66C2A5;
+border: 0 solid #66C2A5
+;
+}
+.logo_left {
+float: left;
+width: 10%;
+height: 100%;
+background-color: #66C2A5;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.logo_right {
+float: right;
+width: 10%;
+height: 100%;
+background-color: #66C2A5;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.poster_title {
+text-align: center;
+position: relative;
+float: left;
+width: 80%;
+height: 100%;
+color: #FFFFFF;
+top: 50%;
+transform: translateY(-50%);
+-webkit-transform: translateY(-50%);
+}
+#title {
+font-family: Palatino;
+}
+/* unvisited link */
+a:link {
+color: #A6D854;
+text-decoration: none;
+}
+.mybreak {
+  break-before: column;
+}
+/* visited link */
+a:visited {
+color: #A6D854;
+text-decoration: none;
+}
+
+/* mouse over link */
+a:hover {
+color: #A6D854;
+text-decoration: none;
+}
+
+/* selected link */
+a:active {
+color: #A6D854;
+text-decoration: none;
+}
+.poster_body {
+-webkit-column-count: 4; /* Chrome, Safari, Opera */
+-moz-column-count: 4; /* Firefox */
+column-count: 4;
+-webkit-column-fill: auto;
+-moz-column-fill: auto;
+column-fill: auto;
+-webkit-column-rule-width: 1mm;
+-moz-column-rule-width: 1mm;
+column-rule-width: 1mm;
+-webkit-column-rule-style: dashed;
+-moz-column-rule-style: dashed;
+column-rule-style: dashed;
+-webkit-column-rule-color: #66C2A5;
+-moz-column-rule-color: #66C2A5;
+column-rule-color: #66C2A5;
+column-gap: 1em;
+padding-left: 0.5em;
+padding-right: 0.5em;
+height: 100%;
+color: #000000
+background-color: #ffffff;
+}
+.poster_title h1 {
+font-size: 75pt;
+margin: 0;
+border: 0;
+font-weight: normal;
+}
+.poster_body_wrap{
+width: 45in;
+height: calc(100% - 17%);
+padding-top: calc(38in * 0.01);
+padding-bottom: calc(38in * 0.01);
+background-color: #ffffff;
+}
+.poster_title h3 {
+color: #ffffff;
+font-size: 50pt;
+margin: 0;
+border: 0;
+font-weight: normal;
+}
+.poster_title h3 > sup {
+  font-size: 35pt;
+  margin-left: 0.02em;
+}
+.poster_title h5 {
+color: #FFFFFF;
+font-size: 35pt;
+margin: 0;
+border: 0;
+font-weight: normal;
+}
+img {
+margin-top: 0;
+margin-bottom: 0;
+}
+.section {
+  padding: 0.2em;
+}
+.poster_body h1 {
+text-align: center;
+color: #FFFFFF;
+font-size: 65pt;
+border: 2mm solid #66C2A5;
+background-color: #66C2A5;
+border-radius: 4mm 0mm;
+margin-top: 2mm;
+margin-bottom: 2mm;
+font-weight: normal;
+}
+.poster_body h2 {
+color: #000000;
+font-size: 40pt;
+padding-left: 4mm;
+font-weight: normal;
+}
+.span {
+width: 200%;
+}
+/* center align leaflet map,
+from https://stackoverflow.com/questions/52112119/center-leaflet-in-a-rmarkdown-document */
+.html-widget {
+margin: auto;
+position: sticky;
+margin-top: 2cm;
+margin-bottom: 2cm;
+}
+.leaflet.html-widget.html-widget-static-bound.leaflet-container.leaflet-touch.leaflet-fade-anim.leaflet-grab.leaflet-touch-drag.leaflet-touch-zoom {
+position: sticky;
+width: 100%;
+}
+pre.sourceCode.r, pre.sourceCode.python {
+background-color: #ffffff20;
+border: solid #ffffff 1mm;
+border-radius: 0.5em;
+padding: 4mm;
+margin: auto;
+margin-top: 1em;
+margin-bottom: 1em;
+/* align-items: center; */
+}
+div.sourceCode {
+background-color: transparent;
+width: 85%;
+margin-left: auto;
+margin-right: auto;
+}
+code.sourceCode.r, code.sourceCode.python {
+background-color: transparent;
+font-size: 20pt;
+border-radius: 2mm;
+}
+code {
+font-size: 25pt;
+font-family: monospace;
+background-color: #ffffff24;
+color: #ffffff;
+padding: 1.2mm;
+line-height: 1;
+border-radius: 2mm;
+}
+.caption {
+font-size: 20pt;
+}
+.table caption {
+font-size: 20pt;
+padding-bottom: 3mm;
+
+}
+code {
+font-size: 1em;
+font-family: monospace;
+background-color: #ffffff24;
+color: #66C2A5;
+padding: 1.2mm;
+border-radius: 2mm;
+}
+.poster_title code {
+font-size: 1em;
+}
+table {
+font-size: 40px;
+margin: auto;
+border-top: 3px solid #666;
+border-bottom: 3px solid #666;
+}
+table thead th {
+border-bottom: 3px solid #ddd;
+}
+td {
+padding: 8px;
+}
+th {
+padding: 15px;
+}
+caption {
+margin-bottom: 10px;
+}
+.poster_body p {
+margin-right: 4mm;
+margin-left: 4mm;
+margin-top: 6mm;
+margin-bottom: 10mm;
+color: #000000
+}
+.poster_body ol {
+margin-right: 4mm;
+margin-left: 4mm;
+}
+#ul {
+margin-right: 4mm;
+margin-left: 4mm;
+}
+.references p {
+font-size: 20pt;
+}
+.orcid img {
+  width: 1em;
+}
+</style>
+</head>
+<body>
+
+
+<div class="poster_wrap">
+<div class="title_container">
+<!-- Left Logo  -->
+<div class="logo_left">
+<img src=George_Fox.jpeg style="width: 80%">
+</div>
+<!-- Poster Title -->
+<div class= "poster_title">
+<h1 id="title">Quaker Stories and the Use of Quake Language</h1>
+<h3 id="author">Elin Waring<sup>1</sup></h3>
+<h5 id="affiliation"><sup>1</sup> Department of Sociology, Lehman College</h5>
+</div>
+<!-- Right Logo  -->
+<div class="logo_right">
+<img src=lehmanlogo.png style="width: 80%">
+</div>
+</div>
+
+<div class='poster_body_wrap'>
+<div class='poster_body'>
+<style type="text/css">
+p {
+   font-size: 32px;
+}
+#selected-references.div {
+  font-size: 20px;
+}
+
+#refs {
+  font-size: 20px;
+}
+
+</style>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The Religious Society of Friends (Quakers) is a Protestant denomination that was founded in England
+in the 1640s by George Fox. Some of the key features
+of the religion are its commitment to the idea
+of that of God in all, pacifism and simplicity. In the
+United States they are associated with abolitionism.</p>
+<p>J.V. Hodgkin was the daughter of a prominent Quaker family in England. She wrote a number of books on Quaker
+topics and was deeply involved in Quaker life in the
+United Kingdom. The most famous (still in print today) is
+<em>A Book of Quaker Saints</em> (1917). The book contains a series of historical stories,
+mainly about individuals who she describes as “early Quaker saints.”
+Some of the stories are drawn from the journal
+of George Fox, the founder of Quakerism.</p>
+<p>In addition, there are stories of events
+involving multiple people, such as “Fierce Feathers” and “Children of Reading
+Meeting.” These stories are well-known and widely retold among Quakers.
+These stories are more like stories of miracles than
+stories of individual saints.</p>
+<p>What do these stories tell us about Quaker attitudes?<br />
+Can computational text analysis give us any insights?</p>
+<div id="objectives" class="section level2">
+<h2>Objectives</h2>
+<ol style="list-style-type: decimal">
+<li>To identify patterns across the stories.</li>
+<li>Ways in which the stories labelled as appropriate for children might differ from the other stories.</li>
+<li>To describe how these relate to Quaker ideas.</li>
+</ol>
+</div>
+</div>
+<div id="methods" class="section level1">
+<h1>Methods</h1>
+<p>To analyze these questions, the entire text was obtained from Project
+Gutenburg. Following initial processing it was tokenized to individual words
+and these were stemmed
+using the Porter 2 Snowball algorithm. For common names the
+separate names were made into a single token, for example
+“george fox” became “george_fox”. In cases where the same
+person was referred to by different names (such as “etienne de grellet” being recoded to “stephen_grellet”)</p>
+<p>The original book includes extensive front matter, back matter and
+32 stories. Each story also included an epigraph. For this analysis only the main story texts were included.</p>
+<p>Additional cleaning specifically related to this text included adding
+a customized set of stop words (for archaic Quaker usage such are thou,
+thee, thine and hast).</p>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+<p>The most common words in the text are shown in Figure 1.</p>
+<p><em>Figure 1 Word Cloud</em>
+<img src="poster_files/figure-html/unnamed-chunk-7-1.png" alt="" width="672" /></p>
+<p>George Fox appears frequently as do the words God and Lord, but other terms are also
+more ordinary, although perhaps what might be expected in stories, such as
+time, day and people. The word friend is common; in this context this has
+two potential meanings: Quakers are also called Friends and the ordinary
+meaning of a person someone is friends with, which might be common in
+stories for children.</p>
+</div>
+<div id="george-fox-and-quaker-words" class="section level1">
+<h1>George Fox and Quaker words</h1>
+<p>Although Quaker words is concentrated in a few stories. In
+particular “Pale Windflowers” uses 118 of them. The story
+is about the important early Quaker leader William Dewsbury
+and his granddaughter. Most
+of the Quaker words are part of dialogues between them or with
+her mother or aunt.</p>
+<p>The limitation that using “george_fox” rather
+that “fox” means that the presence of mentions of Fox may be
+undercounted</p>
+<p><img src="poster_files/figure-html/unnamed-chunk-9-1.png" alt="" width="672" /></p>
+<p>Overall, there is negative relationship between
+the frequency of george_fox and the use of Quaker words.
+The stories for younger readers generally have more uses
+of these terms,
+but they seem to be an alternatives. That is, there
+are not many that have many uses of both.</p>
+</div>
+<div id="sentiment-analysis" class="section level1">
+<h1>Sentiment Analysis</h1>
+<p>Sentiment analysis provides a way to interpret the words used in a body
+of text. It uses standard lexicons
+to characterize individual words used.</p>
+<div id="the-nrc-lexicon" class="section level2">
+<h2>The NRC lexicon</h2>
+<p>The NRC lexicon assigns descriptive
+terms to words; some words are assigned multiple labels.
+In the book as a whole, “trust” was, by far, the most frequently assigned sentiment.
+Anticipation, fear and joy formed the second highest group.
+This approach gives a richer understanding of the content.</p>
+<p><img src="poster_files/figure-html/unnamed-chunk-11-1.png" alt="" width="672" /></p>
+</div>
+</div>
+<div id="clustering-the-stories" class="section level1">
+<h1>Clustering the stories</h1>
+<p>Cluster analysis is a type of unsupervised machine learning
+that allows identification of subgroups in data based
+on the similarity of variables. In this case
+it is used to identify groups of stories that
+have similar profiles on the NRC sentiments. For
+each story, the proportion of words with each of the
+sentiments are the clustering variables.</p>
+<p>In the Quaker stories data there are two clearly
+defined clusters.</p>
+<p><img src="poster_files/figure-html/unnamed-chunk-14-1.png" alt="" width="672" /></p>
+<p>Overall, however, the differences between the clusters
+are not primarily about the sentiments expressed, but are
+in the extent to which any sentiment is expressed. Cluster 2
+expresses <em>more</em> sentiments than Cluster 1, regardless of
+what the sentiment is.</p>
+<p><img src="poster_files/figure-html/unnamed-chunk-15-1.png" alt="" width="672" /></p>
+<table>
+<caption><span id="tab:unnamed-chunk-16">Table 1: </span>Characteristics of Stories in Clusters</caption>
+<thead>
+<tr class="header">
+<th align="right">cluster</th>
+<th align="right">N of Stories</th>
+<th align="right">Quaker Words</th>
+<th align="right">George Fox</th>
+<th align="right">For Younger</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">22</td>
+<td align="right">17</td>
+<td align="right">16</td>
+<td align="right">9</td>
+</tr>
+<tr class="even">
+<td align="right">2</td>
+<td align="right">10</td>
+<td align="right">9</td>
+<td align="right">9</td>
+<td align="right">7</td>
+</tr>
+</tbody>
+</table>
+<p>The stories in cluster 2 have a much higher proportion of
+use of george_fox and Quaker words and are more likely to
+be for younger readers.</p>
+<div id="topic-models" class="section level2">
+<h2>Topic models</h2>
+<p>Topic modelling is another method of unsupervised
+machine learning. It attempts to identify common
+topics that are characterised by use of specific words.
+The same words can appear in multiple topics and each
+document (in this case story) can contain multiple topics.</p>
+<p><img src="poster_files/figure-html/unnamed-chunk-17-1.png" alt="" width="672" /></p>
+<pre><code>## # A tibble: 8 × 6
+##   topic     N `Cluster 1` `Cluster 2` Younger `Quaker Words`
+##   &lt;int&gt; &lt;int&gt;       &lt;int&gt;       &lt;int&gt;   &lt;int&gt;          &lt;int&gt;
+## 1     1     5           3           2       2              3
+## 2     2     3           1           2       3              3
+## 3     3     2           2           0       1              2
+## 4     4     6           5           1       2              5
+## 5     5     3           1           2       2              2
+## 6     6     6           6           0       4              5
+## 7     7     4           3           1       0              3
+## 8     8     3           1           2       2              3</code></pre>
+</div>
+</div>
+<div id="next-steps" class="section level1">
+<h1>Next Steps</h1>
+<p>The next step of this research will be to analyze the epigraphs associated
+with each story. The similarities and differences with the text of the
+stories will be explored.</p>
+<p>Other collections of Quaker stories that are not always presented as stories
+of saints and may be from different time periods will be analyzed and compared
+to the <em>Quaker Saints</em>.</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>Quantitative analysis of the text provides a distinctive way of analyzing the
+Quaker stories.
+This analysis may also give us insights into the kinds of stories that might
+have been thought of as appropriate for children of different ages. In
+1935 a collection <em>The Children’s Story Caravan</em> and in 1962 an abridged version
+<em>Friendly Story Caravan</em> with just 18 stories published. A 1990 edition contained just 18 stories. Many of the same incidents and people are included in these later works, but some are excluded. Overall the
+idea of what kind of stories would be most appropriate for children
+seemed to change dramatically over those 80 years. This may reflect
+societal change in ideas about children.</p>
+<p>Frost (1971) discussed the Quaker practice of treating children as
+“little adults” and its theological basis. Although his focus was on an earlier
+period, this may be reflected in the creation of a book that is not specifically
+for children. However, Hodgkin’s designation of some stories as more suitable
+for children under age 9 may reflect some mixed feelings about this in
+the early twentieth century. Compton’s work, which is much more recent,
+describes one child recalling being very upset about one particular story
+and</p>
+<div class="float">
+<img src="fierefeathers.jpg" alt="Illustration of the Fierce Feathers Story" />
+<div class="figcaption">Illustration of the Fierce Feathers Story</div>
+</div>
+</div>
+<div id="selected-references" class="section level1">
+<h1>Selected References</h1>
+<div id="selected-references">
+<p>Crompton, Margaret. n.d. “Spiritual Equality in the Experience of Quaker Children.”</p>
+<p>Frost, Jerry W. 1971. “As The Twig Is Bent: Quaker Ideas of Childhood.” Quaker History 60(2):67–87.</p>
+<p>Hodgkin, L. V. (Lucy Violet). 1917. “A Book of Quaker Saints.” <a href="Https://Www.Gutenberg.Org/Files/19605/19605-h/19605-h.Htm" class="uri">Https://Www.Gutenberg.Org/Files/19605/19605-h/19605-h.Htm</a>. Retrieved May 14, 2024</p>
+</div>
+Selected Packages used<br />
+
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-R-wordcloud" class="csl-entry">
+Fellows, Ian. 2018. <em>Wordcloud: Word Clouds</em>. <a href="http://blog.fellstat.com/?cat=11">http://blog.fellstat.com/?cat=11</a>.
+</div>
+<div id="ref-R-factoextra" class="csl-entry">
+Kassambara, Alboukadel, and Fabian Mundt. 2020. <em>Factoextra: Extract and Visualize the Results of Multivariate Data Analyses</em>. <a href="http://www.sthda.com/english/rpkgs/factoextra">http://www.sthda.com/english/rpkgs/factoextra</a>.
+</div>
+<div id="ref-R-cluster" class="csl-entry">
+Maechler, Martin, Peter Rousseeuw, Anja Struyf, and Mia Hubert. 2025. <em>Cluster: "Finding Groups in Data": Cluster Analysis Extended Rousseeuw Et Al.</em> <a href="https://svn.r-project.org/R-packages/trunk/cluster/">https://svn.r-project.org/R-packages/trunk/cluster/</a>.
+</div>
+<div id="ref-R-tidytext" class="csl-entry">
+Robinson, David, and Julia Silge. 2025. <em>Tidytext: Text Mining Using Dplyr, Ggplot2, and Other Tidy Tools</em>. <a href="https://juliasilge.github.io/tidytext/">https://juliasilge.github.io/tidytext/</a>.
+</div>
+<div id="ref-tidytext2016" class="csl-entry">
+Silge, Julia, and David Robinson. 2016. <span>“Tidytext: Text Mining and Analysis Using Tidy Data Principles in r.”</span> <em>JOSS</em> 1 (3). <a href="https://doi.org/10.21105/joss.00037">https://doi.org/10.21105/joss.00037</a>.
+</div>
+<div id="ref-R-posterdown" class="csl-entry">
+Thorne, Brent. 2026. <em>Posterdown: Generate PDF Conference Posters Using r Markdown</em>. <a href="https://github.com/brentthorne/posterdown">https://github.com/brentthorne/posterdown</a>.
+</div>
+<div id="ref-ggplot22016" class="csl-entry">
+Wickham, Hadley. 2016. <em>Ggplot2: Elegant Graphics for Data Analysis</em>. Springer-Verlag New York. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.
+</div>
+<div id="ref-R-ggplot2" class="csl-entry">
+Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen, Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, Dewey Dunnington, and Teun van den Brand. 2026. <em>Ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics</em>. <a href="https://ggplot2.tidyverse.org">https://ggplot2.tidyverse.org</a>.
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+</body>
+</html>

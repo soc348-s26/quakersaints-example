@@ -103,7 +103,7 @@ if (file.exists(here("data/qs_tokens.rda"))) {
 } else {
   message("qs_tokens file does not exist")
 }
-}
+
 
 qs_tokens |> 
   filter(text_type == "Story", 
@@ -114,6 +114,8 @@ qs_tokens |>
 qs_tokens_stories |> group_by(section_title, word_stemmed) |> 
   summarize(n = n()) |>
 cast_dtm( term = word_stemmed, document=section_title, n) -> quakersaints_dtm
+
+save(quakersaints_dtm, file = here("data/quakersaints_dtm.rda"))
 ```
 
 Now I have a "large DocumentTermMatrix" in my environment.

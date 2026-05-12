@@ -1,5 +1,5 @@
 ---
-title: The tragic darkness in the picture--Quaker Stories for Children
+title: Quaker Stories and the Use of Quake Language
 author:
   - name: Elin Waring
     affil: 1
@@ -38,6 +38,7 @@ knitr::clean_cache()
 knitr::opts_chunk$set(echo = FALSE, message = FALSE,
                       warning = FALSE)
 ```
+
 ```{r}
 # note that to generate a pdf of the poster you should
 # add
@@ -51,7 +52,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE,
 library(dplyr)
 library(tidyr)
 library(tidytext)
-#library(topicmodels)
+library(topicmodels)
 library(ggplot2)
 library(SnowballC)
 #library(stm)
@@ -68,9 +69,13 @@ library(ggrepel)
 library(pagedown)
 library(cluster)
 library(factoextra)
+library(random)
 ```
 ```{r}
+# Load my saved datasets  
 load(here("data/qs_tokens.rda"))
+load(here("data/story_level_data.rda"))
+load(here("data/qs_nrc.rda"))
 ```
 
 # Introduction
@@ -82,12 +87,18 @@ of that of God in all, pacifism and simplicity. In the
 United States they are associated with abolitionism.  
 
 J.V. Hodgkin was the daughter of a prominent Quaker family in England. She wrote a number of books on Quaker
-topics. The most famous (still in print today) is
+topics and was deeply involved in Quaker life in the 
+United Kingdom. The most famous (still in print today) is
 _A Book of Quaker Saints_ (1917). The book contains a series of historical stories, 
 mainly about individuals who she describes as "early Quaker saints."
-In addition, there stories of events
+Some of the stories are drawn from the journal
+of George Fox, the founder of Quakerism. 
+
+In addition, there are stories of events
 involving multiple people, such as "Fierce Feathers" and "Children of Reading
 Meeting."  These stories are well-known and widely retold among Quakers.
+These stories are more like stories of miracles than 
+stories of individual saints.
 
 What do these stories tell us about Quaker attitudes?   
 Can computational text analysis give us any insights? 
@@ -97,13 +108,13 @@ knitr::include_graphics(here("images/fierefeathers.jpg"), error=FALSE)
 ```
 
 ## Objectives
-1. To identify common elements across the stories.
+1. To identify patterns across the stories.
 2. Ways in which the stories labelled as appropriate for children might differ from the other stories.
 3. To describe how these relate to Quaker ideas.
 
 # Methods
 
-To analyze these questions, the entire text was obtaied from Project
+To analyze these questions, the entire text was obtained from Project
 Gutenburg. Following initial processing it was tokenized to individual words
 and these were stemmed 
 using the Porter 2 Snowball algorithm. For common names the
@@ -121,14 +132,17 @@ thee, thine and hast).
 # Results
 
 ```{r}
+
 qs_tokens |>
   filter(text_type == "Story" & 
            title_type == "main") -> 
   qs_analysis
 ```
 ```{r}
-qs_analysis |> mutate(word_stemmed = wordStem(word)) -> 
-  qs_analysis
+# I already stored the word_stemmed variable so I 
+# don't need to do it again.
+#qs_analysis |> mutate(word_stemmed = wordStem(word)) -> 
+#  qs_analysis
 qs_analysis|> group_by(word_stemmed) |>
   summarize(count = n()) |> 
   filter(count > 10 )->qs_counts
@@ -161,7 +175,7 @@ stories for children.
 Although Quaker words is concentrated in a few stories. In 
 particular "Pale Windflowers" uses 118 of them. The story
 is about the important early Quaker leader William Dewsbury 
-and his grand daughter. Most 
+and his granddaughter. Most 
 of the Quaker words are part of dialogues between them or with
 her mother or aunt. 
 
@@ -169,35 +183,44 @@ The limitation that using "george_fox" rather
 that "fox" means that the presence of mentions of Fox may be
 undercounted
 
-```{r}
-qs_tokens |>  
-  filter(text_type == "Story" & title_type == "main") |>
+```{r eval = FALSE}
+# I already loaded the story_level_data so I don't
+# need to do this here. Therefore I have
+# set this chunk to eval=FALSE
+
+qs_analysis |>
   group_by(section_title) |>
-  summarize(`George Fox` = sum(word == "george_fox"), 
+  summarize(`George Fox` = sum(word == "george_fox"),
             `Quaker Words` = sum(quaker_word == "Yes"),
             `Younger Readers` = unique(younger)) ->
-  quaker_counts
-#quaker_counts |>
-#        kable(caption = "Presence of 'George Fox' and Quaker Words by story")
+  story_level_data
+# I also decided that this took up too much space in the 
+#poster.  I will put this table in my poster_supplements file.
+ story_level_data |>
+        kable(caption = "Presence of 'George Fox' and Quaker Words by story")
 ```
 
 
 
 
 ```{r}
-quaker_counts |> filter(section_title != "XXI. PALE WIND FLOWERS: OR THE LITTLE PRISON MAID") |>
+story_level_data |> filter(section_title != "XXI. PALE WIND FLOWERS: OR THE LITTLE PRISON MAID") |>
 ggplot( aes(x = `George Fox`, y = `Quaker Words`,
         color = `Younger Readers`))  +
   geom_point() +
+  geom_smooth(method = "lm") +
   labs(title = "Counts of George Fox and Quaker Words",
        subtitle = "`Pale Windflowers` excluded")
+
+
 ```
 
-Overall, there is a general negative relationship between
+Overall, there is negative relationship between
 the frequency of george_fox and the use of Quaker words. 
-The stories for younger readers often have many uses of 
-either, but it seems to be an alternative. That is, there 
-are not any that have many uses of both terms.
+The stories for younger readers generally have more uses 
+of these terms, 
+but they seem to be an alternatives. That is, there 
+are not many that have many uses of both. 
 
 # Sentiment Analysis
 
@@ -210,14 +233,15 @@ to characterize individual words used.
 
 The NRC lexicon  assigns descriptive
 terms to words; some words are assigned multiple labels. 
-In the book as a whole, "trust" was the most frequently assigned sentiment.
+In the book as a whole, "trust" was, by far, the most frequently assigned sentiment.
 Anticipation, fear and joy formed the second highest group. 
 This approach gives a richer understanding of the content.
 
-```{r}
-nrc <- get_sentiments("nrc")
-```
-```{r}
+```{r eval=FALSE}
+# since I have saved the results already  don't 
+# need to run this here. Hence I use eval=FALSE when
+# generating the poster.
+nrc <- get_sentiment("nrc")
 nrc |> inner_join( qs_analysis, by = "word", multiple = "all",
                    relationship = "many-to-many") |>
   filter(
@@ -228,7 +252,9 @@ nrc |> inner_join( qs_analysis, by = "word", multiple = "all",
 ```{r fig.height=4}
 #table(qs_nrc$sentiment)
 #table(qs_nrc$sentiment, qs_nrc$title)
-ggplot(qs_nrc, aes(x = sentiment, color = sentiment, fill = sentiment)) +
+qs_nrc |>
+  filter(!sentiment %in% c("negative", "positive")) |>
+ggplot( aes(x = sentiment,  fill = sentiment)) +
   geom_bar() +
     theme_minimal() +
   theme(legend.position = "none") +
@@ -239,7 +265,10 @@ ggplot(qs_nrc, aes(x = sentiment, color = sentiment, fill = sentiment)) +
 ```
 
 ```{r fig.width = 7, eval=FALSE}
-ggplot(qs_nrc, aes(x = younger, color = sentiment, fill = sentiment))  +
+# notice that I decided not to include this one
+qs_nrc |>
+  filter(!sentiment %in% c("negative", "positive")) |>
+ggplot( aes(y = sentiment, color = younger, fill = younger))  +
   geom_bar() +
   coord_flip() +
 #  facet_grid(rows = vars(younger),  scales = "free_y") +
@@ -253,46 +282,68 @@ ggplot(qs_nrc, aes(x = younger, color = sentiment, fill = sentiment))  +
   scale_color_brewer(palette = "Set1")
   
 ```
+```{r eval=FALSE}
+#  These results were not interesting!
+qs_nrc |>
+    filter(!sentiment %in% c("negative", "positive")) -> nonegpos
+table(nonegpos$younger, nonegpos$sentiment) |>  
+  prop.table(1) |> round(2) |> 
+  kable(caption = "Sentiment by Audience")
+```
 
-The distribution of these terms indicates that it is particular stories that
-have many words reflecting the NRC sentiments. (X-squared = 711.75, df = 203, p-value < 2.2e-16)
-There are important differences between the two groups of stories. The stories
-appropriate for children have more labelled words overall. A Chi-squared
-test of independence leads to rejection of the null
-hypothesis that the two variables are independent. 
-The children's
-stories are much more likely to have the emotions of fear, joy and trust than the other stories. (X-squared = 20.885, df = 7, p-value = 0.003944)
 
 # Clustering the stories
 
-```{r}
+Cluster analysis is a type of unsupervised machine learning
+that allows identification of subgroups in data based
+on the similarity of variables.  In this case 
+it is used to identify groups of stories that 
+have similar profiles on the NRC sentiments. For 
+each story, the proportion of words with each of the
+sentiments are the clustering variables.
+
+In the Quaker stories data there are two clearly 
+defined clusters. 
+
+```{r }
 if (!exists("qs_nrc" )){
-  load(here("data/qs_nrc.rda"))
+  if (file.exists(here("data/qs_nrc.rda"))){
+    load(here("data/qs_nrc.rda"))
+  } else {
+    stop("The qs_nrc file does not exist")
+  }
+}
+if (!file.exists(here("data/k2rda"))) {
+    qs_nrc$title_short <- sub("\\..*","", qs_nrc$section_title)
+    
+    title_translate <- qs_nrc |> 
+      group_by(section_title, title_short) |> 
+      summarize(n_tokens = n())
+    table(qs_nrc$title_short, qs_nrc$sentiment) |>
+      prop.table() |>
+      as.data.frame() |> pivot_wider(values_from = Freq, names_from = Var2) -> nrcdata
+    
+    nrcdata <- as.data.frame(nrcdata)
+    rownames(nrcdata) <- nrcdata$Var1
+    nrcdata <- nrcdata[-1]
+    qs_dist <- dist(nrcdata)
+    pam(qs_dist, k = 2, metric = "euclidean", stand = FALSE) -> k2
+    dd <- cbind(nrcdata, cluster = k2$cluster) 
+    dd$title_short <- rownames(dd)
+    dd <- dd |>  left_join(title_translate, by = "title_short")
+    
+    nrcdata <- as.data.frame(nrcdata)
+    rownames(nrcdata) <- nrcdata$Var1
+    nrcdata <- nrcdata[-1]
+    k2$data <- nrcdata
+    k2$diss <- qs_dist
+    # I am going to save the k2 data here so that I don't
+    # have to run this each time.
+    save(k2, file= here("data/k2.rda"))
+} else {
+  load(here("data/k2.rda"))
 }
 
-qs_nrc$title_short <- sub("\\..*","", qs_nrc$section_title)
-
-title_translate <- qs_nrc |> 
-  group_by(section_title, title_short) |> 
-  summarize(n_tokens = n())
-table(qs_nrc$title_short, qs_nrc$sentiment) |>
-  prop.table() |>
-  as.data.frame() |> pivot_wider(values_from = Freq, names_from = Var2) -> nrcdata
-
-nrcdata <- as.data.frame(nrcdata)
-rownames(nrcdata) <- nrcdata$Var1
-nrcdata <- nrcdata[-1]
-qs_dist <- dist(nrcdata)
-pam(qs_dist, k = 2, metric = "euclidean", stand = FALSE) -> k2
-dd <- cbind(nrcdata, cluster = k2$cluster) 
-dd$title_short <- rownames(dd)
-dd <- dd |>  left_join(title_translate, by = "title_short")
-
-nrcdata <- as.data.frame(nrcdata)
-rownames(nrcdata) <- nrcdata$Var1
-nrcdata <- nrcdata[-1]
-k2$data <- nrcdata
-k2$diss <- qs_dist
 fviz_cluster(k2,
     ##palette = c("#00AFBB", "#FC4E07"), # color palette
     ellipse.type = "t", # Concentration ellipse
@@ -307,7 +358,7 @@ expresses _more_ sentiments than Cluster 1, regardless of
 what the sentiment is.
 
 ```{r fig.width = 7}
-dd <- dd |> left_join(quaker_counts)
+#dd <- dd |> left_join()
 dd |> pivot_longer(cols = c(anticipation:trust),
                    names_to = "sentiment",
                    values_to = "value") |>
@@ -328,11 +379,11 @@ ggplot( aes(x = cluster, y= value, color = sentiment, fill = sentiment))  +
 
 
 ```{r}
-dd |> group_by(cluster) |> 
+story_level_data |> group_by(cluster) |> 
   summarize(`N of Stories` = n(),
-            `Quaker Words` = sum(`Quaker Words` > 0),
-            `George Fox` = sum(`George Fox` > 0),
-            `For Younger` = sum(`Younger Readers`)) |>
+            `Quaker Words` = sum(any_quaker_words == "Yes"),
+            `George Fox` = sum(mention_fox == "Yes"),
+            `For Younger` = sum(`Younger Readers` == TRUE)) |>
   kable(caption = "Characteristics of Stories in Clusters")
 ```
 
@@ -340,6 +391,69 @@ The stories in cluster 2 have a much higher proportion of
 use of george_fox and Quaker words and are more likely to
 be for younger readers.
 
+## Topic models
+
+Topic modelling is another method of unsupervised 
+machine learning. It attempts to identify common
+topics that are characterised by use of specific words.
+The same words can appear in multiple topics and each
+document (in this case story) can contain multiple topics.
+
+```{r fig.height=6}
+seed <- randomNumbers(n=1, col = 1)
+load(here("data/quakersaints_dtm.rda"))
+qs_lda_8 <-
+  LDA( quakersaints_dtm, k = 8, control = list(seed= seed))
+qs_topics_8 <- tidy(qs_lda_8, matrix = "beta")
+qs_topics_8_g <- tidy(qs_lda_8, matrix = "gamma")
+
+# Decided this took up too much space
+#qs_topics_8_g |> group_by(document) |>
+#slice_max(gamma) |> arrange(topic) |>
+#kable()
+
+qs_topics_8_g |> group_by(document) |>
+slice_max(gamma) |> arrange(topic) -> qs_t_8_g_max
+qs_lda_8 <-
+  LDA( quakersaints_dtm, k = 8, control = list(seed = 1234))
+qs_topics_8 <- tidy(qs_lda_8, matrix = "beta")
+
+qs_top_terms_8 <- qs_topics_8 |>
+  group_by(topic) |>
+  slice_max(beta, n = 10) |>
+  ungroup() |>
+  arrange(topic, -beta)
+
+qs_top_terms_8 |>
+  mutate(term = reorder_within(term, beta, topic)) |>
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
+```
+```{r}
+story_level_data |> group_by(topic) |>
+  summarize(N = n(), `Cluster 1` = sum(cluster == 1),
+  `Cluster 2` = sum(cluster == 2),
+  `Younger` = sum(`Younger Readers`),
+  `Quaker Words` = sum(any_quaker_words == "Yes")
+  )
+
+# table(story_level_data$topic, story_level_data$any_quaker_words) |>
+#   kable(caption = "Uses Quaker words")
+# 
+# table(story_level_data$topic,
+#       story_level_data$mention_fox) |>
+#   kable(caption = "Mentions George Fox full name")
+# 
+# table(story_level_data$topic, 
+#       story_level_data$`Younger Readers`) |>
+#   kable(caption = "Younger Readers")
+# 
+# table(story_level_data$topic, 
+#       story_level_data$cluster) |>
+#   kable(caption = "Younger Readers")
+```
 
 
 
