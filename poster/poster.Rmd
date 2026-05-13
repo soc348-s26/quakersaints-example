@@ -16,7 +16,6 @@ primary_colour: "#66C2A5"
 secondary_colour: "#ffffff"
 accent_colour: "#A6D854"
 sectitle_bgcol: "#66C2A5"
-bibliography: "packages.bib"
 nocite: '@*'
 ---
 
@@ -30,6 +29,10 @@ p {
 
 #refs {
   font-size: 20px;
+}
+
+#mybreak {
+  break-before: column;
 }
 
 ```
@@ -399,8 +402,9 @@ topics that are characterised by use of specific words.
 The same words can appear in multiple topics and each
 document (in this case story) can contain multiple topics.
 
-```{r fig.height=6}
+```{r fig.height=6, fig.width=7}
 seed <- randomNumbers(n=1, col = 1)
+# add check for this
 load(here("data/quakersaints_dtm.rda"))
 qs_lda_8 <-
   LDA( quakersaints_dtm, k = 8, control = list(seed= seed))
@@ -408,9 +412,9 @@ qs_topics_8 <- tidy(qs_lda_8, matrix = "beta")
 qs_topics_8_g <- tidy(qs_lda_8, matrix = "gamma")
 
 # Decided this took up too much space
-#qs_topics_8_g |> group_by(document) |>
-#slice_max(gamma) |> arrange(topic) |>
-#kable()
+# qs_topics_8_g |> group_by(document) |>
+# slice_max(gamma) |> arrange(topic) |>
+# kable()
 
 qs_topics_8_g |> group_by(document) |>
 slice_max(gamma) |> arrange(topic) -> qs_t_8_g_max
@@ -429,15 +433,22 @@ qs_top_terms_8 |>
   ggplot(aes(beta, term, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ topic, scales = "free") +
-  scale_y_reordered()
+  scale_y_reordered() 
 ```
-```{r}
+
+Note: Add discussion of these topics here
+
+<div style="break-before: column;"></div>
+```{r }
 story_level_data |> group_by(topic) |>
   summarize(N = n(), `Cluster 1` = sum(cluster == 1),
   `Cluster 2` = sum(cluster == 2),
   `Younger` = sum(`Younger Readers`),
-  `Quaker Words` = sum(any_quaker_words == "Yes")
-  )
+  `Quaker Words` = sum(any_quaker_words == "Yes"),
+  `Fox` = sum(mention_fox == "Yes")
+  ) |> 
+  kbl(caption = "Topic relationship to other story characteristics") |>
+  kable_styling( font_size = 13) 
 
 # table(story_level_data$topic, story_level_data$any_quaker_words) |>
 #   kable(caption = "Uses Quaker words")
@@ -485,25 +496,18 @@ period, this may be reflected in the creation of a book that is not specifically
 for children.  However, Hodgkin's designation of some stories as more suitable
 for children under age 9 may reflect some mixed feelings about this in
 the early twentieth century. Compton's work, which is much more recent,
-describes one child recalling being very upset about one particular story
-and 
+describes one child recalling being very upset about one particular story (The Children of Reading Meeting).
 
-![Illustration of the Fierce Feathers Story](fierefeathers.jpg)
+![Illustration of the Fierce Feathers Story](fiercefeathers.jpg)
 
-```{r, include=FALSE}
+```{r, eval=FALSE, include=FALSE}
 #knitr::write_bib(c('knitr','rmarkdown','posterdown','pagedown'), 'packages.bib')
-knitr::write_bib(c( 'tidytext', 'ggplot2', 'posterdown', 'wordcloud', 'cluster', 'factoextra', 'posterdown'), 'packages.bib')
+#knitr::write_bib(c( 'tidytext', 'ggplot2', 'posterdown', 'wordcloud', 'cluster', 'factoextra', 'posterdown'), 'packages.bib')
 ```
 
-# Selected References
-<div id = "selected-references">
-Crompton, Margaret. n.d. “Spiritual Equality in the Experience of Quaker Children.”
+# Supplemental Materials
 
-Frost, Jerry W. 1971. “As The Twig Is Bent: Quaker Ideas of Childhood.” Quaker History 60(2):67–87.  
+References and data about the individual stories 
+can be found at this website.
 
-Hodgkin, L. V. (Lucy Violet). 1917. “A Book of Quaker Saints.” Https://Www.Gutenberg.Org/Files/19605/19605-h/19605-h.Htm. Retrieved May 14, 2024 
-
-</div>
-
-Selected Packages used  
-<div id="refs"></div>
+![QRcode](poster/qrcode.png)
