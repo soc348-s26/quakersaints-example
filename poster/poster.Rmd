@@ -507,7 +507,6 @@ describes one child recalling being very upset about one particular story (The C
 
 # Supplemental Materials
 
-References and data about the individual stories 
-can be found at this website.
-
-![QRcode](poster/qrcode.png)
+```{r}
+knitr::include_graphics("qrcode.png")
+```

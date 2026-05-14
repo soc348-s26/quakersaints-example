@@ -566,4 +566,11 @@ save(story_level_data, file = here("data/story_level_data.rda"))
 table(story_level_data$`Younger Readers`, story_level_data$any_quaker_words
       )
 ```
+```{r}
+story_level_data |>
+  select(section_title, n_tokens, `George Fox`,
+         `Quaker Words`, `Younger Readers`, cluster,
+         topic) |>
+    write.csv(file = here("poster/story_level_data.csv"))
+```
 
