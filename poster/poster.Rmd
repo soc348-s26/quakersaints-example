@@ -12,6 +12,7 @@ logoleft_name: George_Fox.jpeg
 output: 
   posterdown::posterdown_html:
     self_contained: false
+always_allow_html: true
 primary_colour: "#66C2A5"
 secondary_colour: "#ffffff"
 accent_colour: "#A6D854"
