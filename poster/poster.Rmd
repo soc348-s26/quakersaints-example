@@ -130,8 +130,8 @@ The original book includes extensive front matter, back matter and
 32 stories. Each story also included an epigraph. For this analysis only the main story texts were included.
 
 Additional cleaning specifically related to this text included adding
-a customized set of stop words (for archaic Quaker usage such are thou,
-thee, thine and hast).  
+a customized set of words (for archaic Quaker usage such are thou,
+thee, thine and hast) was created 
 
 # Results
 
@@ -204,16 +204,13 @@ qs_analysis |>
         kable(caption = "Presence of 'George Fox' and Quaker Words by story")
 ```
 
-
-
-
 ```{r}
 story_level_data |> filter(section_title != "XXI. PALE WIND FLOWERS: OR THE LITTLE PRISON MAID") |>
 ggplot( aes(x = `George Fox`, y = `Quaker Words`,
         color = `Younger Readers`))  +
   geom_point() +
   geom_smooth(method = "lm") +
-  labs(title = "Counts of George Fox and Quaker Words",
+  labs(title = "Figure 2: Counts of `George Fox` and Quaker Words",
        subtitle = "`Pale Windflowers` excluded")
 
 
@@ -262,7 +259,7 @@ ggplot( aes(x = sentiment,  fill = sentiment)) +
   geom_bar() +
     theme_minimal() +
   theme(legend.position = "none") +
-  labs(title = "Figure 4: NRC sentiment distribution for all stories",
+  labs(title = "Figure 3: NRC sentiment distribution for all stories",
        y = "Number of words") +
   scale_fill_brewer(palette = "Set1") +
   scale_color_brewer(palette = "Set1")
@@ -294,7 +291,36 @@ table(nonegpos$younger, nonegpos$sentiment) |>
   prop.table(1) |> round(2) |> 
   kable(caption = "Sentiment by Audience")
 ```
+It is not surprising that trust is the most common emotion in
+many of the stories. In the lexicon, trust is matched with
+498 different words in our data set. 
+These words often have strong religious content (God
+is the most common and Lord is the second most) and
+connections to Friends' theology and family.
 
+"The Man in Leather Breeches" is a story 
+about Goerge Fox that does not name him, instead 
+describing him. Its most common sentiment is 
+anticipation. 
+"Fierce Feathers" and "Taming the Tiger" both 
+have fear as their most common sentiment; each
+of them recounts a situation where Quakers are being 
+threatened and they respond non violently and survive
+the perceived threats of Native Americans and Pirates.
+
+*Figure 4: Word cloud for trust sentiment*
+
+```{r fig.height=4}
+
+qs_nrc |> filter(sentiment == "trust") |>
+  group_by(word) |>
+  summarize(n = n()) -> trust_counts
+  
+  wordcloud(words = trust_counts$word, freq = trust_counts$n, 
+            random.order = FALSE, col = pal,
+            max.words = 50) 
+```
+ 
 
 # Clustering the stories
 
@@ -309,7 +335,7 @@ sentiments are the clustering variables.
 In the Quaker stories data there are two clearly 
 defined clusters. 
 
-```{r }
+```{r fig.height=6,fig.width=6}
 if (!exists("qs_nrc" )){
   if (file.exists(here("data/qs_nrc.rda"))){
     load(here("data/qs_nrc.rda"))
@@ -317,7 +343,7 @@ if (!exists("qs_nrc" )){
     stop("The qs_nrc file does not exist")
   }
 }
-if (!file.exists(here("data/k2rda"))) {
+if (!file.exists(here("data/k2.rda"))) {
     qs_nrc$title_short <- sub("\\..*","", qs_nrc$section_title)
     
     title_translate <- qs_nrc |> 
@@ -352,7 +378,8 @@ fviz_cluster(k2,
     ##palette = c("#00AFBB", "#FC4E07"), # color palette
     ellipse.type = "t", # Concentration ellipse
     repel = TRUE, # Avoid label overplotting (slow)
-    ggtheme = theme_classic())
+    ggtheme = theme_classic()) +
+  labs(title = "Figure 5: Clustering of stories")
 ```
 
 Overall, however, the differences between the clusters
@@ -361,9 +388,12 @@ in the extent to which any sentiment is expressed. Cluster 2
 expresses _more_ sentiments than Cluster 1, regardless of 
 what the sentiment is.
 
-```{r fig.width = 7}
+```{r fig.width = 6, fig.height=4}
 #dd <- dd |> left_join()
-dd |> pivot_longer(cols = c(anticipation:trust),
+load(here("data/story_level_data.rda"))
+#dd |> 
+story_level_data |>  
+  pivot_longer(cols = c(anticipation:trust),
                    names_to = "sentiment",
                    values_to = "value") |>
 ggplot( aes(x = cluster, y= value, color = sentiment, fill = sentiment))  +
@@ -374,7 +404,7 @@ ggplot( aes(x = cluster, y= value, color = sentiment, fill = sentiment))  +
  theme( axis.text.y = element_text(size = 5),
         axis.ticks.y=element_blank(),
         axis.text.x = element_text(angle = 60)) +
-  labs(title = "Figure 5: Distribution of NRC Sentiments by cluster",
+  labs(title = "Figure 6: Distribution of NRC Sentiments by cluster",
         x = "Cluster") +
   scale_fill_brewer(palette = "Set1") +
   scale_color_brewer(palette = "Set1")
@@ -401,27 +431,34 @@ Topic modelling is another method of unsupervised
 machine learning. It attempts to identify common
 topics that are characterised by use of specific words.
 The same words can appear in multiple topics and each
-document (in this case story) can contain multiple topics.
+document (in this case story) can contain multiple topics. 
+The top words for each topic are those with the highest
+values of beta.
 
 ```{r fig.height=6, fig.width=7}
-seed <- randomNumbers(n=1, col = 1)
+#seed <- randomNumbers(n=1, col = 1)
+
 # add check for this
-load(here("data/quakersaints_dtm.rda"))
-qs_lda_8 <-
-  LDA( quakersaints_dtm, k = 8, control = list(seed= seed))
+
+if (file.exists(here("data/qs_lda_8.rda"))) {
+    load(here("data/qs_lda_8.rda"))
+} else {
+  seed<-96
+  qs_lda_8 <-
+    LDA( quakersaints_dtm, k = 8, 
+         control = list(seed= seed))
+  
+  save(qs_lda_8,  file = here("data/qs_lda_8.rda"))
+}
+
+
 qs_topics_8 <- tidy(qs_lda_8, matrix = "beta")
 qs_topics_8_g <- tidy(qs_lda_8, matrix = "gamma")
 
-# Decided this took up too much space
-# qs_topics_8_g |> group_by(document) |>
-# slice_max(gamma) |> arrange(topic) |>
-# kable()
-
 qs_topics_8_g |> group_by(document) |>
-slice_max(gamma) |> arrange(topic) -> qs_t_8_g_max
-qs_lda_8 <-
-  LDA( quakersaints_dtm, k = 8, control = list(seed = 1234))
-qs_topics_8 <- tidy(qs_lda_8, matrix = "beta")
+      slice_max(gamma) |> 
+      arrange(topic) -> 
+     qs_t_8_g_max
 
 qs_top_terms_8 <- qs_topics_8 |>
   group_by(topic) |>
@@ -434,12 +471,26 @@ qs_top_terms_8 |>
   ggplot(aes(beta, term, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ topic, scales = "free") +
-  scale_y_reordered() 
+  scale_y_reordered() +
+  labs(title = "Figure 7: Top terms for 8 topics")
+
+```
+```{r eval=FALSE}
+# Only run the next set of lines if the seed is changed
+# check the gamma names
+story_level_data |> 
+  select(-topic, -gamma.y, -gamma.x) |>
+ left_join(qs_t_8_g_max, 
+          join_by("section_title"  == "document")) ->
+  story_level_data
+save(story_level_data, 
+     file = here("data/story_level_data.rda"))
+write.csv(story_level_data,file =
+           here("data/story_level_data.csv") )
 ```
 
 Note: Add discussion of these topics here
 
-<div style="break-before: column;"></div>
 ```{r }
 story_level_data |> group_by(topic) |>
   summarize(N = n(), `Cluster 1` = sum(cluster == 1),
@@ -451,33 +502,16 @@ story_level_data |> group_by(topic) |>
   kbl(caption = "Topic relationship to other story characteristics") |>
   kable_styling( font_size = 13) 
 
-# table(story_level_data$topic, story_level_data$any_quaker_words) |>
-#   kable(caption = "Uses Quaker words")
-# 
-# table(story_level_data$topic,
-#       story_level_data$mention_fox) |>
-#   kable(caption = "Mentions George Fox full name")
-# 
-# table(story_level_data$topic, 
-#       story_level_data$`Younger Readers`) |>
-#   kable(caption = "Younger Readers")
-# 
-# table(story_level_data$topic, 
-#       story_level_data$cluster) |>
-#   kable(caption = "Younger Readers")
+
 ```
-
-
 
 # Next Steps
 
-The next step of this research will be to analyze the epigraphs associated
-with each story. The similarities and differences with the text of the 
-stories will be explored. 
+In the future, the topics will be analyzed in more
+detail and the relationship between them and other
+variables will be studied using structural topic modelling.
 
-Other collections of Quaker stories that are not always presented as stories
-of saints and may be from different time periods will be analyzed and compared
-to the _Quaker Saints_.  
+ 
 
 # Conclusion
 
@@ -497,9 +531,8 @@ period, this may be reflected in the creation of a book that is not specifically
 for children.  However, Hodgkin's designation of some stories as more suitable
 for children under age 9 may reflect some mixed feelings about this in
 the early twentieth century. Compton's work, which is much more recent,
-describes one child recalling being very upset about one particular story (The Children of Reading Meeting).
+describes one child recalling being very upset about one particular story ("The Children of Reading Meeting").
 
-![Illustration of the Fierce Feathers Story](fiercefeathers.jpg)
 
 ```{r, eval=FALSE, include=FALSE}
 #knitr::write_bib(c('knitr','rmarkdown','posterdown','pagedown'), 'packages.bib')

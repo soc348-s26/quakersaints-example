@@ -128,13 +128,25 @@ qs_nrc |> filter (!sentiment %in% c("positive", "negative") ) |>
 
 It may not be surprising that trust is the most common emotion in
 many of the stories. In the lexicon trust is matched with
-494 different words in our data set.  Twenty of them are shown.
+498 different words in our data set.  Twenty of them
+are shown.  "The Man in Leather Breeches" is a story 
+about Goerge fox that does not name him, instead 
+descripting him. Its most common sentiment is 
+anticipation. 
+"Fierce Feathers" and "Taming the Tiger" both 
+have fear as their most common sentiment; each
+of them recounts a situation where Quakers are being 
+threatened and they respond  non violently. 
 
 ```{r}
-qs_nrc |> filter(sentiment == "trust") -> trustwords
-length(unique(trustwords$word))
+qs_nrc |> filter(sentiment == "trust") |>
+  group_by(word) |>
+  summarize(n = n()) |>
+  slice_max(n = 10, order_by = n)
 
-head(unique(trustwords$word), 20)
+
+
+#head(unique(trustwords$word), 20)
 
 ```
 
